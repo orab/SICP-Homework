@@ -1,0 +1,96 @@
+* Exercise1.1
+  依次输出的结果为:
+  10
+  12
+  8
+  3
+  6
+  a = 3
+  b = 4
+  19
+  #f
+  4
+  16
+  6
+  16
+* Exercise1.2
+  该表达式的前缀形式为:
+  #+NAME: Exercise1.2
+  #+BEGIN_SRC scheme
+  (/ (+ 5 4 (- 2
+               (- 3
+                  (+ 6 (/ 4 5)))))
+     (* 3 (- 6 2) (- 2 7)))
+  #+END_SRC
+* Exercise1.3
+  以三个数为参数, 返回其中教大的两个数之和的程序为:
+  #+NAME: Exercise1.3
+  #+BEGIN_SRC scheme
+  (define (max2-sum a b c)
+    (if (> a b)
+        (if (> b c)
+            (+ a b)
+            (+ a c))
+        (if (> a c)
+            (+ a b)
+            (+ b c))))
+  #+END_SRC
+* Exercise1.4
+  根据 b 的值为正还是负来决定是做加法还是做减法, 相当于加 b 的绝对值操作.
+* Exercise1.5
+  1. 如果采用应用序求值, 由于解释器要先求出两个参数的值, 而第二个参数会导致无限
+     的递归循环, 所以采用应用序会使程序陷入无限的递归中;
+  2. 如果采用正则序求值, 解释器只有在需要时才会求值, 这样当程序测试第一个参数时
+     第二个参数还未被求值, 因此程序返回结果0.
+* Exercise1.6
+  作为一个普通的函数过程, 解释器会预先对所有的参数进行求值, 这样的话, 无论
+  =predicate= 语句为真与否, =then-clause= 和 =else-clause= 都会执行, 如果两部分
+  之间存在依赖, 就会出现错误.
+  在用 =new-if= 实现的平方根程序中, 由于两部分的分支语句都会被执行, 而在 =else=
+  部分的语句是递归调用的, 所以程序会陷入无限递归中.
+* Exercise1.7
+  如果数很小, 使用原程序时计算过程会提前终止, 比如该数为0.00000001时, 由于数字
+  本身远小于阈值, 这样只要中间值的平方进入0.00000001到0.00010001的范围内就会终
+  止计算返回结果, 显然这样误差很大; 如果数很大, 由于使用的浮点数只能表示一定精
+  度范围以内的值, 程序可能永远无法得到满足给定阈值的结果, 因此程序会陷入无限的
+  循环之中.
+  采用相对值比较的改进程序如下所示:
+  #+Name: Exercise1.7
+  #+BEGIN_SRC scheme
+  (define (new-sqrt x)
+    (define (sqrt-iter guess last-guess x)
+      (if (good-enough? guess last-guess)
+          guess
+          (sqrt-iter (improve guess x)
+                      guess
+                      x)))
+    (define (good-enough? current last)
+      (< (abs (/ (- last current) current))
+         0.001))
+    (define (improve guess x)
+      (average guess (/ x guess)))
+    (define (average x y)
+      (/ (+ x y) 2))
+    (sqrt-iter 1.0 0.0 x))
+    #+END_SRC
+* Exercise1.8
+  求立方根的过程如下:
+  #+Name: Exercise1.8
+  #+BEGIN_SRC scheme
+  (define (cubt x)
+    (define (cubt-iter guess last-guess x)
+      (if (good-enough? guess last-guess)
+          guess
+          (cubt-iter (improve guess x)
+                     guess
+                     x)))
+    (define (good-enough? current last)
+      (< (abs (/ (- last current) current))
+         0.001))
+    (define (improve guess x)
+      (/ (+ (/ x (* guess guess))
+            (* 2 guess))
+         3))
+    (cubt-iter 1.0 0.0 x))
+    #+END_SRC
+* Exercise1.9
