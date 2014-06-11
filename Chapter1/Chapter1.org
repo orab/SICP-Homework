@@ -164,3 +164,45 @@
 
   =(f n)= 计算的是 =2*n=; =(g n)= 计算的是 =2^n=, 当 =n = 0= 时为 =0=; =(h n)=
   计算的是 =2^(2^n)=, 当 =n = 0= 是为 =0=.
+* Exercise1.11
+  采用递归计算过程的程序为:
+  #+Name: Exercise1.11.1
+  #+BEGIN_SRC scheme
+  (define (f n)
+    (if (< n 3)
+        n
+        (+ (f (- n 1))
+           (* 2 (f (- n 2)))
+           (* 3 (f (- n 3))))))
+  #+END_SRC
+
+  采用迭代计算过程的程序为:
+  #+Name: Exercise1.11.2
+  #+BEGIN_SRC scheme
+  (define (f n)
+    (define (f-iter c b a count)
+      (cond ((= count 0) a)
+            ((= count 1) b)
+            ((= count 2) c)
+            (else (f-iter (+ c (* 2 b) (* 3 a))
+                          c
+                          b
+                          (- count 1)))))
+    (f-iter 2 1 0 n))
+  #+END_SRC
+* Exercise1.12
+  递归计算帕斯卡三角形的程序为:
+  #+Name: Exercise1.12
+  #+BEGIN_SRC scheme
+  (define (pascal r c)
+    (cond ((or (> c r) (< c 1)) 0)
+          ((= r 1) 1)
+          (else (+ (pascal (- r 1)
+                           (- c 1))
+                   (pascal (- r 1)
+                           c)))))
+  #+END_SRC
+* Exercise1.13
+  利用线性递归的特征多项式可求得斐波那契数列的封闭形式, 然后可证明之.
+* TODO Exercise1.14
+  绘制展开树.
