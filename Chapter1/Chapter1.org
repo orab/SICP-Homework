@@ -1,3 +1,5 @@
+#+TITLE: SICP Homework: Chapter1
+#+AUTHOR: Orab
 * Exercise1.1
   依次输出的结果为:
   10,
@@ -206,3 +208,26 @@
   利用线性递归的特征多项式可求得斐波那契数列的封闭形式, 然后可证明之.
 * TODO Exercise1.14
   绘制展开树.
+  空间增长为 \Theta(n), 步数增长为 \Theta(2^n).
+* Exercise1.15
+  1. 12.15 = 0.05 * 3^5, 即在求值 =(sine 12.15)= 时将从0.05开始计算, 每次得到三
+     倍于该角度的正弦值, 所以p将被使用5次.
+  2. 空间和步数的增长都为 \Theta(log n). 对于一棵递归树来说, 所用空间相当于该树
+     的最大深度, 所用步数相当于所有结点的个数. 当为线性递归时, 最大深度等于所有
+     结点个数, 即空间增长与步数增长相同.
+* Exercise1.16
+  按照迭代方式来计算幂的过程为:
+  #+Name: Exercise1.16
+  #+BEGIN_SRC scheme
+  (define (fast-expt b n)
+    (define (fast-expt-iter a b n)
+      (cond ((= n 0) a)
+            ((even? n)
+             (fast-expt-iter a (* b b) (/ n 2)))
+            (else
+             (fast-expt-iter (* a b)
+                        (* b b)
+                        (/ (- n 1) 2)))))
+    (fast-expt-iter 1 b n))
+  #+END_SRC
+* Exercise1.17
