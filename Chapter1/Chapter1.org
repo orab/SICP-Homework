@@ -226,8 +226,89 @@
              (fast-expt-iter a (* b b) (/ n 2)))
             (else
              (fast-expt-iter (* a b)
-                        (* b b)
-                        (/ (- n 1) 2)))))
+                             (* b b)
+                             (/ (- n 1) 2)))))
     (fast-expt-iter 1 b n))
-  #+END_SRC
+    #+END_SRC
 * Exercise1.17
+  计算乘法的过程为:
+  #+Name: Exercise1.17
+  #+BEGIN_SRC scheme
+  (define (fast-multi a b)
+    (define (double n)
+      (* n 2))
+    (define (halve n)
+      (/ n 2))
+    (cond ((= b 0) 0)
+          ((even? b) (fast-multi (double a) (halve b)))
+          (else (+ a (fast-multi a (- b 1))))))
+  #+END_SRC
+* Exercise1.18
+  迭代版本的乘法计算过程为:
+  #+Name: Exercise1.18
+  #+BEGIN_SRC scheme
+  (define (fast-multi a b)
+    (define (double n)
+      (* n 2))
+    (define (halve n)
+      (/ n 2))
+    (define (fast-multi-iter a b r)
+      (cond ((= b 0) r)
+            ((even? b)
+             (fast-multi-iter (double a) (halve b) r))
+            (else
+             (fast-multi-iter (double a) (halve (- b 1)) (+ r a)))))
+    (fast-multi-iter a b 0))
+  #+END_SRC
+* Exercise1.19
+  经过简单计算化简可得: p' = p^2+q^2, q' = 2pq + q^2, 将该变换带入对应的过程,
+  得到只需对数步的求Fibonacci数的程序为:
+  #+Name: Exercise1.19
+  #+BEGIN_SRC scheme
+  (define (fib n)
+    (define (fib-iter a b p q count)
+      (cond ((= count 0) b)
+            ((even? count)
+             (fib-iter a
+                       b
+                       (+ (* p p) (* q q))
+                       (+ (* 2 p q) (* q q))
+                       (/ count 2)))
+            (else (fib-iter (+ (* b q) (* a q) (* a p))
+                            (+ (* b p) (* a q))
+                            p
+                            q
+                            (- count 1)))))
+    (fib-iter 1 0 0 1 n))
+  #+END_SRC
+* Exercise1.20
+  采用正则序展开为:
+  #+Name: Exercise1.20.1
+  #+BEGIN_SRC scheme
+  (gcd 206 40)
+  (gcd 40 (remainder 206 40))
+  (gcd (remainder 206 40) (remainder 40 (remainder 206 40)))
+  (gcd (remainder 40 (remainder 206 40))
+       (remainder (remainder 206 40)
+                  (remainder 40 (remainder 206 40))))
+  (gcd (remainder (remainder 206 40)
+                  (remainder 40 (remainder 206 40)))
+       (remainder (remainder 40 (remainder 206 40))
+                  (remainder (remainder 206 40)
+                             (remainder 40 (remainder 206 40)))))
+  #+END_SRC
+  实际执行了11次remainder运算.
+
+  其中定义remainder运算的过程为:
+  #+Name: Exercise1.20.2
+  #+BEGIN_SRC scheme
+  (define (remainder a b)
+    (- a
+       (* b
+          (floor (/ a b)))))
+  #+END_SRC
+
+  如果采用应用序的话实际需要执行remainder运算4次.
+* Exercise1.21
+  199的最小因子是199, 1999的最小因子是1999, 19999的最小因子是7.
+* Exercise1.22
