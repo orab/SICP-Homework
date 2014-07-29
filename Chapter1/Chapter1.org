@@ -1,33 +1,35 @@
-12#+TITLE: SICP Homework: Chapter1
+#+STARTUP: indent
+#+TITLE: SICP Homework: Chapter1
 #+AUTHOR: Orab
+
 * Exercise1.1
-  依次输出的结果为:
-  10,
-  12,
-  8,
-  3,
-  6,
-  a = 3,
-  b = 4,
-  19,
-  #f,
-  4,
-  16,
-  6,
-  16
+依次输出的结果为:
+10,
+12,
+8,
+3,
+6,
+a = 3,
+b = 4,
+19,
+#f,
+4,
+16,
+6,
+16
 * Exercise1.2
-  该表达式的前缀形式为:
-  #+NAME: Exercise1.2
-  #+BEGIN_SRC scheme
+该表达式的前缀形式为:
+#+NAME: Exercise1.2
+#+BEGIN_SRC scheme
   (/ (+ 5 4 (- 2
                (- 3
                   (+ 6 (/ 4 5)))))
      (* 3 (- 6 2) (- 2 7)))
-  #+END_SRC
+#+END_SRC
 * Exercise1.3
-  以三个数为参数, 返回其中教大的两个数之和的程序为:
-  #+NAME: Exercise1.3
-  #+BEGIN_SRC scheme
+以三个数为参数, 返回其中教大的两个数之和的程序为:
+#+NAME: Exercise1.3
+#+BEGIN_SRC scheme
   (define (max2-sum a b c)
     (if (> a b)
         (if (> b c)
@@ -36,38 +38,38 @@
         (if (> a c)
             (+ a b)
             (+ b c))))
-  #+END_SRC
+#+END_SRC
 * Exercise1.4
-  根据 b 的值为正还是负来决定是做加法还是做减法, 相当于加 b 的绝对值操作.
+根据 b 的值为正还是负来决定是做加法还是做减法, 相当于加 b 的绝对值操作.
 * Exercise1.5
-  1. 如果采用应用序求值, 由于解释器要先求出两个参数的值, 而第二个参数会导致无限
-     的递归循环, 所以采用应用序会使程序陷入无限的递归中;
-  2. 如果采用正则序求值, 解释器只有在需要时才会求值, 这样当程序测试第一个参数时
-     第二个参数还未被求值, 因此程序返回结果0.
+1. 如果采用应用序求值, 由于解释器要先求出两个参数的值, 而第二个参数会导致无限
+   的递归循环, 所以采用应用序会使程序陷入无限的递归中;
+2. 如果采用正则序求值, 解释器只有在需要时才会求值, 这样当程序测试第一个参数时
+   第二个参数还未被求值, 因此程序返回结果0.
 * Exercise1.6
-  作为一个普通的函数过程, 解释器会预先对所有的参数进行求值, 这样的话, 无论
-  =predicate= 语句为真与否, =then-clause= 和 =else-clause= 都会执行, 如果两部分
-  之间存在依赖, 就会出现错误.
+作为一个普通的函数过程, 解释器会预先对所有的参数进行求值, 这样的话, 无论
+=predicate= 语句为真与否, =then-clause= 和 =else-clause= 都会执行, 如果两部分
+之间存在依赖, 就会出现错误.
 
-  在用 =new-if= 实现的平方根程序中, 由于两部分的分支语句都会被执行, 而在 =else=
-  部分的语句是递归调用的, 所以程序会陷入无限递归中.
+在用 =new-if= 实现的平方根程序中, 由于两部分的分支语句都会被执行, 而在 =else=
+部分的语句是递归调用的, 所以程序会陷入无限递归中.
 * Exercise1.7
-  如果数很小, 使用原程序时计算过程会提前终止, 比如该数为0.00000001时, 由于数字
-  本身远小于阈值, 这样只要中间值的平方进入0.00000001到0.00010001的范围内就会终
-  止计算返回结果, 显然这样误差很大; 如果数很大, 由于使用的浮点数只能表示一定精
-  度范围以内的值, 程序可能永远无法得到满足给定阈值的结果, 因此程序会陷入无限的
-  循环之中.
+如果数很小, 使用原程序时计算过程会提前终止, 比如该数为0.00000001时, 由于数字
+本身远小于阈值, 这样只要中间值的平方进入0.00000001到0.00010001的范围内就会终
+止计算返回结果, 显然这样误差很大; 如果数很大, 由于使用的浮点数只能表示一定精
+度范围以内的值, 程序可能永远无法得到满足给定阈值的结果, 因此程序会陷入无限的
+循环之中.
 
-  采用相对值比较的改进程序如下所示:
-  #+Name: Exercise1.7
-  #+BEGIN_SRC scheme
+采用相对值比较的改进程序如下所示:
+#+Name: Exercise1.7
+#+BEGIN_SRC scheme
   (define (new-sqrt x)
     (define (sqrt-iter guess last-guess x)
       (if (good-enough? guess last-guess)
           guess
           (sqrt-iter (improve guess x)
-                      guess
-                      x)))
+                     guess
+                     x)))
     (define (good-enough? current last)
       (< (abs (/ (- last current) current))
          0.001))
@@ -76,11 +78,11 @@
     (define (average x y)
       (/ (+ x y) 2))
     (sqrt-iter 1.0 0.0 x))
-    #+END_SRC
+#+END_SRC
 * Exercise1.8
-  求立方根的过程如下:
-  #+Name: Exercise1.8
-  #+BEGIN_SRC scheme
+求立方根的过程如下:
+#+Name: Exercise1.8
+#+BEGIN_SRC scheme
   (define (cubt x)
     (define (cubt-iter guess last-guess x)
       (if (good-enough? guess last-guess)
@@ -96,11 +98,11 @@
             (* 2 guess))
          3))
     (cubt-iter 1.0 0.0 x))
-    #+END_SRC
+#+END_SRC
 * Exercise1.9
-  第一个方法的代换模型展开为:
-  #+Name: Exercise1.9.1
-  #+BEGIN_SRC scheme
+第一个方法的代换模型展开为:
+#+Name: Exercise1.9.1
+#+BEGIN_SRC scheme
   (+ 4 5)
   (inc (+ 3 5))
   (inc (inc (+ 2 5)))
@@ -111,24 +113,24 @@
   (inc (inc 7))
   (inc 8)
   9
-  #+END_SRC
-  这是一个递归的计算过程.
+#+END_SRC
+这是一个递归的计算过程.
 
-  第二个方法的代换模型展开为:
-  #+Name: Exercise1.9.2
-  #+BEGIN_SRC scheme
+第二个方法的代换模型展开为:
+#+Name: Exercise1.9.2
+#+BEGIN_SRC scheme
   (+ 4 5)
   (+ 3 6)
   (+ 2 7)
   (+ 1 8)
   (+ 0 9)
   9
-  #+END_SRC
-  这是一个迭代的计算过程.
+#+END_SRC
+这是一个迭代的计算过程.
 * Exercise1.10
-  将 =(A 1 10)= 展开:
-  #+Name: Exercise1.10.1
-  #+BEGIN_SRC scheme
+将 =(A 1 10)= 展开:
+#+Name: Exercise1.10.1
+#+BEGIN_SRC scheme
   (A 1 10)
   (A 0 (A 1 9))
   (* 2 (A 1 9))
@@ -137,12 +139,12 @@
   ...
   (* 2 (* 2 (* 2 (... (A 1 1)))))
   (* 2 (* 2 (* 2 (... 2))))
-  #+END_SRC
-  即 =(A 1 10)= 的值为 =2^10 = 1024=
+#+END_SRC
+即 =(A 1 10)= 的值为 =2^10 = 1024=
 
-  将 =(A 2 4)= 展开:
-  #+Name: Exercise1.10.2
-  #+BEGIN_SRC scheme
+将 =(A 2 4)= 展开:
+#+Name: Exercise1.10.2
+#+BEGIN_SRC scheme
   (A 2 4)
   (A 1 (A 2 3))
   (A 1 (A 1 (A 2 2)))
@@ -151,36 +153,36 @@
   (A 1 (A 1 4))
   (A 1 16)
   2^16
-  #+END_SRC
-  即 =(A 2 4)= 的值为 =2^(2^4) = 2 ^ 16=
+#+END_SRC
+即 =(A 2 4)= 的值为 =2^(2^4) = 2 ^ 16=
 
-  将 =(A 3 3)= 展开:
-  #+Name: Exercise1.10.3
-  #+BEGIN_SRC scheme
+将 =(A 3 3)= 展开:
+#+Name: Exercise1.10.3
+#+BEGIN_SRC scheme
   (A 3 3)
   (A 2 (A 3 2))
   (A 2 (A 2 (A 3 1)))
   (A 2 (A 2 2))
-  #+END_SRC
-  即 =(A 3 3)= 的值为 =2^2^((2^(2^2)))=
+#+END_SRC
+即 =(A 3 3)= 的值为 =2^2^((2^(2^2)))=
 
-  =(f n)= 计算的是 =2*n=; =(g n)= 计算的是 =2^n=, 当 =n = 0= 时为 =0=; =(h n)=
-  计算的是 =2^(2^n)=, 当 =n = 0= 是为 =0=.
+=(f n)= 计算的是 =2*n=; =(g n)= 计算的是 =2^n=, 当 =n = 0= 时为 =0=; =(h n)=
+计算的是 =2^(2^n)=, 当 =n = 0= 是为 =0=.
 * Exercise1.11
-  采用递归计算过程的程序为:
-  #+Name: Exercise1.11.1
-  #+BEGIN_SRC scheme
+采用递归计算过程的程序为:
+#+Name: Exercise1.11.1
+#+BEGIN_SRC scheme
   (define (f n)
     (if (< n 3)
         n
         (+ (f (- n 1))
            (* 2 (f (- n 2)))
            (* 3 (f (- n 3))))))
-  #+END_SRC
+#+END_SRC
 
-  采用迭代计算过程的程序为:
-  #+Name: Exercise1.11.2
-  #+BEGIN_SRC scheme
+采用迭代计算过程的程序为:
+#+Name: Exercise1.11.2
+#+BEGIN_SRC scheme
   (define (f n)
     (define (f-iter c b a count)
       (cond ((= count 0) a)
@@ -191,11 +193,11 @@
                           b
                           (- count 1)))))
     (f-iter 2 1 0 n))
-  #+END_SRC
+#+END_SRC
 * Exercise1.12
-  递归计算帕斯卡三角形的程序为:
-  #+Name: Exercise1.12
-  #+BEGIN_SRC scheme
+递归计算帕斯卡三角形的程序为:
+#+Name: Exercise1.12
+#+BEGIN_SRC scheme
   (define (pascal r c)
     (cond ((or (> c r) (< c 1)) 0)
           ((= r 1) 1)
@@ -203,22 +205,22 @@
                            (- c 1))
                    (pascal (- r 1)
                            c)))))
-  #+END_SRC
+#+END_SRC
 * Exercise1.13
-  利用线性递归的特征多项式可求得斐波那契数列的封闭形式, 然后可证明之.
+利用线性递归的特征多项式可求得斐波那契数列的封闭形式, 然后可证明之.
 * TODO Exercise1.14
-  绘制展开树.
-  空间增长为 \Theta(n), 步数增长为 \Theta(2^n).
+绘制展开树.
+空间增长为 \Theta(n), 步数增长为 \Theta(2^n).
 * Exercise1.15
-  1. 12.15 = 0.05 * 3^5, 即在求值 =(sine 12.15)= 时将从0.05开始计算, 每次得到三
-     倍于该角度的正弦值, 所以p将被使用5次.
-  2. 空间和步数的增长都为 \Theta(log n). 对于一棵递归树来说, 所用空间相当于该树
-     的最大深度, 所用步数相当于所有结点的个数. 当为线性递归时, 最大深度等于所有
-     结点个数, 即空间增长与步数增长相同.
+1. 12.15 = 0.05 * 3^5, 即在求值 =(sine 12.15)= 时将从0.05开始计算, 每次得到三
+   倍于该角度的正弦值, 所以p将被使用5次.
+   2. 空间和步数的增长都为 \Theta(log n). 对于一棵递归树来说, 所用空间相当于该树
+      的最大深度, 所用步数相当于所有结点的个数. 当为线性递归时, 最大深度等于所有
+      结点个数, 即空间增长与步数增长相同.
 * Exercise1.16
-  按照迭代方式来计算幂的过程为:
-  #+Name: Exercise1.16
-  #+BEGIN_SRC scheme
+按照迭代方式来计算幂的过程为:
+#+Name: Exercise1.16
+#+BEGIN_SRC scheme
   (define (fast-expt b n)
     (define (fast-expt-iter a b n)
       (cond ((= n 0) a)
@@ -229,11 +231,11 @@
                              (* b b)
                              (/ (- n 1) 2)))))
     (fast-expt-iter 1 b n))
-    #+END_SRC
+#+END_SRC
 * Exercise1.17
-  计算乘法的过程为:
-  #+Name: Exercise1.17
-  #+BEGIN_SRC scheme
+计算乘法的过程为:
+#+Name: Exercise1.17
+#+BEGIN_SRC scheme
   (define (fast-multi a b)
     (define (double n)
       (* n 2))
@@ -242,11 +244,11 @@
     (cond ((= b 0) 0)
           ((even? b) (fast-multi (double a) (halve b)))
           (else (+ a (fast-multi a (- b 1))))))
-  #+END_SRC
+#+END_SRC
 * Exercise1.18
-  迭代版本的乘法计算过程为:
-  #+Name: Exercise1.18
-  #+BEGIN_SRC scheme
+迭代版本的乘法计算过程为:
+#+Name: Exercise1.18
+#+BEGIN_SRC scheme
   (define (fast-multi a b)
     (define (double n)
       (* n 2))
@@ -259,12 +261,12 @@
             (else
              (fast-multi-iter (double a) (halve (- b 1)) (+ r a)))))
     (fast-multi-iter a b 0))
-  #+END_SRC
+#+END_SRC
 * Exercise1.19
-  经过简单计算化简可得: p' = p^2+q^2, q' = 2pq + q^2, 将该变换带入对应的过程,
-  得到只需对数步的求Fibonacci数的程序为:
-  #+Name: Exercise1.19
-  #+BEGIN_SRC scheme
+经过简单计算化简可得: p' = p^2+q^2, q' = 2pq + q^2, 将该变换带入对应的过程,
+得到只需对数步的求Fibonacci数的程序为:
+#+Name: Exercise1.19
+#+BEGIN_SRC scheme
   (define (fib n)
     (define (fib-iter a b p q count)
       (cond ((= count 0) b)
@@ -280,11 +282,11 @@
                             q
                             (- count 1)))))
     (fib-iter 1 0 0 1 n))
-  #+END_SRC
+#+END_SRC
 * Exercise1.20
-  采用正则序展开为:
-  #+Name: Exercise1.20.1
-  #+BEGIN_SRC scheme
+采用正则序展开为:
+#+Name: Exercise1.20.1
+#+BEGIN_SRC scheme
   (gcd 206 40)
   (gcd 40 (remainder 206 40))
   (gcd (remainder 206 40) (remainder 40 (remainder 206 40)))
@@ -296,31 +298,31 @@
        (remainder (remainder 40 (remainder 206 40))
                   (remainder (remainder 206 40)
                              (remainder 40 (remainder 206 40)))))
-  #+END_SRC
-  实际执行了11次remainder运算.
+#+END_SRC
+实际执行了11次remainder运算.
 
-  其中定义remainder运算的过程为:
-  #+Name: Exercise1.20.2
-  #+BEGIN_SRC scheme
+其中定义remainder运算的过程为:
+#+Name: Exercise1.20.2
+#+BEGIN_SRC scheme
   (define (remainder a b)
     (- a
        (* b
           (floor (/ a b)))))
-  #+END_SRC
+#+END_SRC
 
-  如果采用应用序的话实际需要执行remainder运算4次.
+如果采用应用序的话实际需要执行remainder运算4次.
 * Exercise1.21
-  199的最小因子是199, 1999的最小因子是1999, 19999的最小因子是7.
+199的最小因子是199, 1999的最小因子是1999, 19999的最小因子是7.
 * Exercise1.22
-  检查给定范围内连续的各个奇数的素性的程序如下:
-  #+Name: Exercise1.23
-  #+BEGIN_SRC scheme
+检查给定范围内连续的各个奇数的素性的程序如下:
+#+Name: Exercise1.23
+#+BEGIN_SRC scheme
   (define (search-for-primes beg end)
     (define (runtime)
       (let ((t (gettimeofday)))
         (+ (* 1000000 (car t))
            (cdr t))))
-    ; Time elapsed for prime-test
+                                          ; Time elapsed for prime-test
     (define (timed-prime-test n)
       (newline)
       (display n)
@@ -331,7 +333,7 @@
     (define (report-prime elapsed-time)
       (display " *** ")
       (display elapsed-time))
-    ; prime test
+                                          ; prime test
     (define (prime? n)
       (= n (smallest-divisor n)))
     (define (smallest-divisor n)
@@ -349,10 +351,10 @@
           ((even? beg) (search-for-primes (+ beg 1) end))
           (else (timed-prime-test beg)
                 (search-for-primes (+ beg 2) end))))
-  #+END_SRC
-  使用该程序得到的对应的素数结果为:
-  #+Name: Output
-  #+BEGIN_SRC
+#+END_SRC
+使用该程序得到的对应的素数结果为:
+#+Name: Output
+#+BEGIN_SRC
   scheme@(guile-user)> (search-for-primes 1000 1020)
 
   1001
@@ -432,12 +434,12 @@
   1000035
   1000037 *** 101
 
-  #+END_SRC
-  可以看出每一次的输出与上一次输出的时间比约为根号10. 和预期的时间消耗相一致.
+#+END_SRC
+可以看出每一次的输出与上一次输出的时间比约为根号10. 和预期的时间消耗相一致.
 * Exercise1.23
-  修改后的smallest-divisor程序为:
-  #+Name: Exercise1.23
-  #+BEGIN_SRC scheme
+修改后的smallest-divisor程序为:
+#+Name: Exercise1.23
+#+BEGIN_SRC scheme
   (define (prime? n)
 
     (define (smallest-divisor n)
@@ -456,10 +458,10 @@
           (+ n 2)))
 
     (= (smallest-divisor n) n))
-  #+END_SRC
-  使用新版本的smallest-divisor的输出为:
-  #+Name: Output
-  #+BEGIN_SRC
+#+END_SRC
+使用新版本的smallest-divisor的输出为:
+#+Name: Output
+#+BEGIN_SRC
   scheme@(guile-user)> (search-for-primes 1000 1020)
 
   1001
@@ -539,20 +541,20 @@
   1000035
   1000037 *** 59
 
-  #+END_SRC
-  运行速度并没有正好快一倍, 但是可以看到, 随着规模的变大, 比值向2在靠近. 原因可
-  能是因为程序中除了主体之外还存在其他的时间消耗, 随着输入规模的变大, 主体所占
-  比重越来越大, 比值也就越来越接近于2.
+#+END_SRC
+运行速度并没有正好快一倍, 但是可以看到, 随着规模的变大, 比值向2在靠近. 原因可
+能是因为程序中除了主体之外还存在其他的时间消耗, 随着输入规模的变大, 主体所占
+比重越来越大, 比值也就越来越接近于2.
 * TODO Exercise1.24
-  使用费马方法修改上述的过程, 程序如下:
-  #+Name: Exercise1.25
-  #+BEGIN_SRC scheme
+使用费马方法修改上述的过程, 程序如下:
+#+Name: Exercise1.25
+#+BEGIN_SRC scheme
   (define (search-for-primes beg end)
     (define (runtime)
       (let ((t (gettimeofday)))
         (+ (* 1000000 (car t))
            (cdr t))))
-    ; Time elapsed for prime-test
+                                          ; Time elapsed for prime-test
     (define (timed-prime-test n)
       (newline)
       (display n)
@@ -563,7 +565,7 @@
     (define (report-prime elapsed-time)
       (display " *** ")
       (display elapsed-time))
-    ; prime test
+                                          ; prime test
     (define (expmod base exp m)
       (cond ((= exp 0) 1)
             ((even? exp)
@@ -587,17 +589,17 @@
           ((even? beg) (search-for-primes (+ beg 1) end))
           (else (timed-prime-test beg)
                 (search-for-primes (+ beg 2) end))))
-  #+END_SRC
+#+END_SRC
 * Exercise1.25
-  题目中的简单写法可以在\Theta(\log(n))的时间里计算出幂, 但是这时的结果会很大,
-  在进行求余的操作时会耗费大量的时间.
+题目中的简单写法可以在\Theta(\log(n))的时间里计算出幂, 但是这时的结果会很大,
+在进行求余的操作时会耗费大量的时间.
 * Exercise1.26
-  如果使用显示的乘法过程, 那么在每次递归时都会调用两次的expmod函数, 这样的话递
-  归树从一棵单链树变为二叉树, 所以时间复杂度由\Theta(log(n))变为\Theta(n).
+如果使用显示的乘法过程, 那么在每次递归时都会调用两次的expmod函数, 这样的话递
+归树从一棵单链树变为二叉树, 所以时间复杂度由\Theta(log(n))变为\Theta(n).
 * Exercise1.27
-  使用小于n的每一个数来做费马验证的过程为:
-  #+Name: Exercise1.27
-  #+BEGIN_SRC scheme
+使用小于n的每一个数来做费马验证的过程为:
+#+Name: Exercise1.27
+#+BEGIN_SRC scheme
   (define (fermat-test n)
 
     (define (expmod base exp m)
@@ -618,10 +620,10 @@
             (else #f)))
     (fermat-test-iter n 1))
 
-  #+END_SRC
-  使用上述过程对Carmichael数进行检验, 其结果如下:
-  #+Name: Exercise1.27.2
-  #+BEGIN_SRC
+#+END_SRC
+使用上述过程对Carmichael数进行检验, 其结果如下:
+#+Name: Exercise1.27.2
+#+BEGIN_SRC
   scheme@(guile-user)> (fermat-test 561)
   $4 = #t
   scheme@(guile-user)> (fermat-test 1105)
@@ -634,11 +636,11 @@
   $8 = #t
   scheme@(guile-user)> (fermat-test 6601)
   $9 = #t
-  #+END_SRC
+#+END_SRC
 * TODO Exercise1.28
-  利用Miller-Rabin检查来判断素数的过程如下:
-  #+Name: Exercise1.28
-  #+BEGIN_SRC scheme
+利用Miller-Rabin检查来判断素数的过程如下:
+#+Name: Exercise1.28
+#+BEGIN_SRC scheme
   (define (miller-rabin-test n)
 
     (define (expmod-ex base exp m)
@@ -657,4 +659,4 @@
 
     (try-it (+ 1 (random (- n 1)))))
 
-  #+END_SRC
+#+END_SRC
