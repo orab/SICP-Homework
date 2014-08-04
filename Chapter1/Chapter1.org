@@ -660,3 +660,146 @@ b = 4,
     (try-it (+ 1 (random (- n 1)))))
 
 #+END_SRC
+* Exercise1.29
+使用辛普森规则计算积分的过程定义为:
+#+NAME: Exercise1.29
+#+BEGIN_SRC scheme
+  (define (integral f a b n)
+
+    (define (sum term a next b i)
+      (if (> a b)
+          0.0
+          (+ (term a i)
+             (sum term (next a) next b (+ 1 i)))))
+
+    (define (term x i)
+      (cond ((= i 0) (f x))
+            ((= i n) (f x))
+            ((even? i) (* 4 (f x)))
+            (else (* 2 (f x)))))
+    (define (next x)
+      (+ x
+         (/ (- b a) n)))
+
+    (* (/ (/ (- b a) n)
+          3)
+       (sum term a next b 0)))
+#+END_SRC
+当n为100时结果为 =0.24671666666666678=, 当n为1000时结果为 =0.24966716666666608=.
+* Exercise1.30
+迭代的sum过程版本为:
+#+Name: Exercise1.30
+#+BEGIN_SRC scheme
+  (define (sum term a next b)
+    (define (iter a result)
+      (if (> a b)
+          result
+          (iter (next a) (+ result
+                            (term a)))))
+    (iter a 0))
+#+END_SRC
+* Exercise1.31
+1. 与 =sum= 类似的 =product= 的过程如下:
+   #+Name: product.scm
+   #+BEGIN_SRC scheme
+     (define (product term a next b)
+       (if (> a b)
+           1
+           (* (term a)
+              (product term (next a) next b))))
+   #+END_SRC
+   用 =product= 定义 =factorial= 的过程为:
+   #+Name: factorial.scm
+   #+BEGIN_SRC scheme
+     (define (factorial n)
+       (define (inc x) (+ 1 x))
+       (product identity 1 inc n))
+   #+END_SRC
+   用 =product= 计算\pi的近似值的过程为:
+   #+Name: pi-product.scm
+   #+BEGIN_SRC scheme
+     (define (pi-product n)
+       (define (term x)
+         (if (even? x)
+             (/ (+ x 2)
+                (+ x 1))
+             (/ (+ x 1)
+                (+ x 2))))
+       (define (next x)
+         (+ x 1))
+       (* 4.0
+          (product term 1 next n)))
+          #+END_SRC
+2. 上述 =product= 的过程是递归的, 与之相对应的迭代版本的过程为:
+   #+Name: product-iter.scm
+   #+BEGIN_SRC scheme
+     (define (product term a next b)
+       (define (product-iter a result)
+         (if (> a b)
+             result
+             (product-iter (next a)
+                           (* (term a) result))))
+       (product-iter a 1))
+   #+END_SRC
+* Exercise1.32
+1. =accumulate= 过程实现如下:
+   #+Name: accumulate.scm
+   #+BEGIN_SRC scheme
+     (define (accumulate combiner null-value term a next b)
+         (if (> a b)
+             null-value
+             (combiner (term a)
+                       (accumulate combiner null-value term (next a) next b))))
+
+   #+END_SRC
+利用 =accumulate= 定义 =sum= 和 =product= 的过程为:
+   #+Name: accumulate-sum&product.scm
+   #+BEGIN_SRC scheme
+     (define (sum term a next b)
+       (accumulate + 0 term a next b))
+
+     (define (product term a next b)
+       (accumulate * 1 term a next b))
+   #+END_SRC
+2. =accumulate= 的迭代版本为:
+   #+Name: accumulate-iter.scm
+   #+BEGIN_SRC scheme
+     (define (accumulate combiner null-value term a next b)
+       (define (iter a result)
+         (if (> a b)
+             result
+             (iter (next a)
+                   (combiner (term a) result))))
+       (iter a null-value))
+   #+END_SRC
+* Exercise1.33
+定义 =filter-accumulate= 的过程如下:
+#+Name: filter-accumulate.scm
+#+BEGIN_SRC scheme
+  (define (filter-accumulate filter combiner null-value term a next b)
+    (cond ((> a b) null-value)
+          ((filter a)
+           (combiner (term a)
+                     (filter-accumulate filter combiner null-value term (next a)
+                                        next b)))
+          (else
+           (combiner null-value
+                     (filter-accumulate filter combiner null-value term (next a)
+                                       next b)))))
+#+END_SRC
+1. 求a到b之间所有素数之和的过程为:
+   #+Name: prime-sum.scm
+   #+BEGIN_SRC scheme
+     (define (prime-sum a b)
+       (define (inc x) (+ 1 x))
+       (filter-accumulate prime? + 0 identity a inc b))
+   #+END_SRC
+2. 求小于n的所有与n互素的正整数的乘积的过程为:
+   #+Name: relatively-prime-sum.scm
+   #+BEGIN_SRC scheme
+     (define (relatively-prime-product n)
+       (define (relatively-prime? x)
+         (= (gcd x n) 1))
+       (define (inc x) (+ x 1))
+       (filter-accumulate relatively-prime? * 1 identity 1 inc n))
+   #+END_SRC
