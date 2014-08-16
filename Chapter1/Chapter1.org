@@ -1,6 +1,7 @@
-#+STARTUP: indent
 #+TITLE: SICP Homework: Chapter1
 #+AUTHOR: Orab
+#+STARTUP: indent
+#+TODO: TODO TOVERIFY | FINISH
 
 * Exercise1.1
 依次输出的结果为:
@@ -545,7 +546,7 @@ b = 4,
 运行速度并没有正好快一倍, 但是可以看到, 随着规模的变大, 比值向2在靠近. 原因可
 能是因为程序中除了主体之外还存在其他的时间消耗, 随着输入规模的变大, 主体所占
 比重越来越大, 比值也就越来越接近于2.
-* TODO Exercise1.24
+* TOVERIFY Exercise1.24
 使用费马方法修改上述的过程, 程序如下:
 #+Name: Exercise1.25
 #+BEGIN_SRC scheme
@@ -637,7 +638,7 @@ b = 4,
   scheme@(guile-user)> (fermat-test 6601)
   $9 = #t
 #+END_SRC
-* TODO Exercise1.28
+* TOVERIFY Exercise1.28
 利用Miller-Rabin检查来判断素数的过程如下:
 #+Name: Exercise1.28
 #+BEGIN_SRC scheme
@@ -876,7 +877,7 @@ b = 4,
 #+END_SRC
 其输出为:
 #+Name: Output
-#+BEGIN_SRC shell
+#+BEGIN_SRC
   scheme@(guile-user)> (root-without-average 1000)
   9.965784284662087
   3.004472209841214
@@ -915,3 +916,121 @@ b = 4,
 
 #+END_SRC
 可以明显看出采用平均阻尼的版本效率更好.
+* TOVERIFY Exercise1.37
+1. 定义一个无穷连分式的函数过程如下:
+   #+Name: cont-frac.scm
+   #+BEGIN_SRC scheme
+     (define (cont-frac n d k)
+       (define (cont-frac-reverse n d x)
+         (if (= x k)
+             (d x)
+             (/ (n x)
+                (+ (d x) (cont-frac-reverse n d (+ 1 x))))))
+       (cont-frac-reverse n d 1))
+    #+END_SRC
+   当 n 和 d 取值都为1时, 前几个取值依次为: =1=, =1/2=, =2/3=, =3/5=, =5/8=,
+   ... 可以观察到分母是一个 Fibonacci 数列, 若要保证得到的近似值具有十进制的4位
+   精度,则分母应该大于10000, 即 k 应满足 =Fib(k)>=10000=, 所以 k 的取值为大于21
+   (fib(21) = 10946).
+2. 上述的函数过程是递归形式的, 相应的迭代形式的版本为:
+   #+Name: cont-frac-iter.scm
+   #+BEGIN_SRC scheme
+     (define (cont-frac n d k)
+       (define (cont-frac-iter n d x result)
+         (if (= x 0)
+             result
+             (cont-frac-iter n d (- x 1)
+                             (/ (n x)
+                                (+ (d x) result)))))
+       (cont-frac-iter n d k 1.0))
+   #+END_SRC
+* Exercise1.38
+ 基于 =cont-frac= 过程来求欧拉展开式关于 e 的近似值的函数过程如下:
+ #+Name: cont-frac-e.scm
+ #+BEGIN_SRC scheme
+   (define (cont-frac-e k)
+     (+ 2 (cont-frac (lambda (i) 1.0)
+                     (lambda (i)
+                       (if (= 0 (remainder (- i 5) 3))
+                           (* (+ (/ (- i 5) 3) 2)
+                              2)
+                           1))
+                     k)))
+
+ #+END_SRC
+* Exercise1.39
+利用 =cont-frac= 来计算 =tan(x)= 的近似值的函数过程如下:
+#+Name: tan-cf.scm
+#+BEGIN_SRC scheme
+  (define (tan-cf x k)
+    (cont-frac (lambda (i)
+                 (if (= i 1)
+                     x
+                     (- (* x x))))
+               (lambda (i)
+                 (- (* i 2) 1))
+               k))
+#+END_SRC
+* Exercise1.40
+定义 =cubic= 的过程如下:
+#+Name: cubit.scm
+#+BEGIN_SRC scheme
+  (define (cubic a b c)
+    (lambda (x)
+      (+ (* x x x)
+         (* a x x)
+         (* b x)
+         c)))
+#+END_SRC
+* Exercise1.41
+最终输出的结果是 =21=, 每调用一次 =double= 相当于调用两次参数表示的函数, 即
+=(double double)= 表示调用4次, =(double (double double))= 表示调用2次4次的过程,
+即 =4 ^ 2 = 16= 次调用, 所以结果为 =5 + 16 = 21=. 使用程序进行验证的输出为:
+#+Name: double.Output
+#+BEGIN_QUOTE
+scheme@(guile-user)> (define (double f) (lambda (x) (f (f x))))
+scheme@(guile-user)> (define (inc x) (+ 1 x))
+scheme@(guile-user)> (inc 2)
+$2 = 3
+scheme@(guile-user)> (((double (double double)) inc) 5)
+$3 = 21
+
+#+END_QUOTE
+* Exercise1.42
+实现函数复合的过程定义如下:
+#+Name: compose.scm
+#+BEGIN_SRC scheme
+  (define (compose f g)
+    (lambda (x)
+      (f (g x))))
+#+END_SRC
+* Exercise1.43
+实现函数多次重复执行的过程定义如下:
+#+Name: repeater.scm
+#+BEGIN_SRC scheme
+  (define (repeater f n)
+    (lambda (x)
+      (if (= n 1)
+          (f x)
+          ((compose f (repeater f (- n 1)))
+           x))))
+#+END_SRC
+* Exercise1.44
+定义平滑函数的生成过程函数的实现如下:
+#+Name: smooth.scm
+#+BEGIN_SRC scheme
+  (define (smooth f)
+    (define dx 0.000001)
+    (lambda (x)
+      (/ (+ (f (+ x dx))
+            (f x)
+            (f (- x dx)))
+         3)))
+#+END_SRC
+利用 =repeater= 生成 n 次平滑函数的过程为:
+#+Name: n-smooth.scm
+#+BEGIN_SRC scheme
+  (define (n-smooth f n)
+    (lambda (x)
+      (((repeater smooth n) f) x)))
+#+END_SRC
