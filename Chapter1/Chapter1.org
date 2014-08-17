@@ -1034,3 +1034,44 @@ $3 = 21
     (lambda (x)
       (((repeater smooth n) f) x)))
 #+END_SRC
+* TODO Exercise1.45
+* Exercise1.46
+迭代式改进的一般化过程抽象定义如下:
+#+Name: iterative-improve.scm
+#+BEGIN_SRC scheme
+  (define (iterative-improve good-enough? improve)
+    (define (try guess)
+      (if (good-enough? guess)
+          guess
+          (try (improve guess))))
+    (lambda (x)
+      (try x)))
+#+END_SRC
+利用上述定义重写 =sqrt= 过程:
+#+Name: sqrt-ii.scm
+#+BEGIN_SRC scheme
+  (define (sqrt n)
+    (define (square x)
+      (* x x))
+    (define (average a b)
+      (/ (+ a b) 2))
+    ((iterative-improve
+      (lambda (guess)
+        (< (abs (- (square guess) n)) 0.001))
+      (lambda (guess)
+        (average guess (/ n guess))))
+     1.0))
+#+END_SRC
+重写 =fixed-point= 过程:
+#+Name: fixed-point-ii.scm
+#+BEGIN_SRC scheme
+  (define (fixed-point f first-guess)
+    (define tolerance 0.00001)
+    ((iterative-improve
+     (lambda (guess)
+       (let ((next (f guess)))
+         (< (abs (- next guess)) tolerance)))
+     (lambda (guess)
+       (f guess)))
+     first-guess))
+#+END_SRC
