@@ -1,0 +1,148 @@
+#+TITLE: SICP Solutions: Chapter2
+#+AUTHOR: Orab
+#+STARTUP: indent
+#+TODO: TODO TOVERIFY |
+
+* Exercise2.1
+对于一个分数而言, 只有当分子分母同时取负时值不变, 所以如果要保证分母始终为正值,
+只需要在分母为负时对分子分母同时取负即可.
+
+=make-rat= 的更好版本定义如下:
+#+Name: make-rat.scm
+#+BEGIN_SRC scheme
+  (define (make-rat numer denom)
+    (let ((g (gcd numer denom)))
+        (if (< (/ denom g) 0)
+            (cons (- (/ numer g)) (- (/ denom g)))
+            (cons (/ numer g) (/ denom g)))))
+
+#+END_SRC
+
+* Exercise2.2
+平面上线段表示的定义实现如下:
+#+Name: segment.scm
+#+BEGIN_SRC scheme
+  (define (make-segment start end)
+    (cons start end))
+  (define (start-segment segment)
+    (car segment))
+  (define (end-segment segment)
+    (cdr segment))
+
+  (define (make-point x y)
+    (cons x y))
+  (define (x-point point)
+    (car point))
+  (define (y-point point)
+    (cdr point))
+
+  (define (print-point point)
+    (newline)
+    (display "(")
+    (display (x-point point))
+    (display ",")
+    (display (y-point point))
+    (display ")"))
+
+  (define (midpoint-segment segment)
+    (make-point (/ (+ (x-point (start-segment segment))
+                      (x-point (end-segment segment)))
+                   2)
+                (/ (+ (y-point (start-segment segment))
+                      (y-point (end-segment segment)))
+                   2)))
+
+#+END_SRC
+验证输出结果为:
+#+Name: Output
+#+BEGIN_SRC shell
+  scheme@(guile-user)> (define x (make-point 2 9))
+  scheme@(guile-user)> (define y (make-point 4 8))
+  scheme@(guile-user)> (define seg (make-segment x y))
+  scheme@(guile-user)> (define mp (midpoint-segment seg))
+  scheme@(guile-user)> (print-point mp)
+
+  (3,17/2)
+
+#+END_SRC
+
+* TODO Exercise2.3
+TODO: 平面矩形是否需要确定位置及旋转角度等信息, 如果需要该怎样实现?
+
+* Exercise2.4
+利用代换模型, 将 =car= 过程依次展开的结果为:
+#+Name: verify
+#+BEGIN_SRC scheme
+  (car (cons x y))
+  ((cons x y) (lambda (p q) p))
+  ((lambda (m) (m x y)) (lambda (p q) p))
+  ((lambda (p q) p) x y)
+  x
+
+#+END_SRC
+
+对应的 =cdr= 的定义为:
+#+Name: cdr.scm
+#+BEGIN_SRC scheme
+  (define (cdr z)
+    (z (lambda (p q) q)))
+#+END_SRC
+
+* Exercise2.5
+由于2的幂和3的幂不存在大于1的公约数, 所以分别找出可以整除的2的最大次幂和可以整
+除的3的最大次幂的结果就可以确定a和b的值.
+
+过程定义如下:
+#+Name: cons-power.scm
+#+BEGIN_SRC scheme
+  (define (power x n)
+    (if (= n 1)
+        x
+        (* x (power x (- n 1)))))
+
+  (define (cons a b)
+    (* (power 2 a)
+       (power 3 b)))
+  (define (car z)
+    (if (= 0 (remainder z 2))
+        (+ 1 (car (/ z 2)))
+        0))
+  (define (cdr z)
+    (if (= 0 (remainder z 3))
+        (+ 1 (cdr (/ z 3)))
+        0))
+#+END_SRC
+
+* Exercise2.6
+通过代换Church计数的 =zero= 和 =add-1= 到 =(add-1 zero)= 中, 结果如下:
+#+Name: one.scm
+#+BEGIN_SRC scheme
+  (add-1 zero)
+  (lambda (f) (lambda (x) (f ((zero f) x))))
+  (lambda (f) (lambda (x) (f (((lambda (f) (lambda (x) x)) f) x))))
+  (lambda (f) (lambda (x) (f ((lambda (x) x) x))))
+  (lambda (f) (lambda (x) (f x)))
+#+END_SRC
+即 =one= 的定义式为 =(lambda (f) (lambda (x) (f x)))=.
+
+再将 =one= 和 =add-1= 代入到 =(add-1 one)= 中, 结果如下:
+#+Name: two.scm
+#+BEGIN_SRC scheme
+  (add-1 two)
+  (lambda (f) (lambda (x) (f ((one f) x))))
+  (lambda (f) (lambda (x) (f (((lambda (f) (lambda (x) (f x))) f) x))))
+  (lambda (f) (lambda (x) (f ((lambda (x) (f x)) x))))
+  (lambda (f) (lambda (x) (f (f x))))
+#+END_SRC
+即 =two= 的定义式为 =(lambda (f) (lambda (x) (f (f x))))=.
+
+经过上面的代换可以看出 =add-1= 的过程实际上相当于在原来的过程中增加了一个 =f=
+函数的迭代调用, 而加法的定义可以看做是 =add-n= 的过程, 即要在原来的过程中增加n
+个 =f= 函数的迭代调用, 等于用Church计数时数n中 =f= 函数迭代调用的次数.
+
+因此加法过程的一个直接定义为:
+#+Name: add.scm
+#+BEGIN_SRC scheme
+  (define (+ a b)
+    (lambda (f) (lambda (x) ((a f) ((b f) x)))))
+#+END_SRC
