@@ -1,7 +1,7 @@
-#+TITLE: SICP Homework: Chapter1
+#+TITLE: SICP Solutions: Chapter1
 #+AUTHOR: Orab
 #+STARTUP: indent
-#+TODO: TODO TOVERIFY | FINISH
+#+TODO: TODO TOVERIFY |
 
 * Exercise1.1
 依次输出的结果为:
