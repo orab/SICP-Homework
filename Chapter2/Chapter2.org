@@ -146,3 +146,80 @@ TODO: 平面矩形是否需要确定位置及旋转角度等信息, 如果需要
   (define (+ a b)
     (lambda (f) (lambda (x) ((a f) ((b f) x)))))
 #+END_SRC
+
+* Exercise2.7
+区间构造的完整基础定义如下:
+#+Name: interval.scm
+#+BEGIN_SRC scheme
+  (define (make-interval a b) (cons a b))
+  (define (upper-bound interval)
+    (if (> (car interval) (cdr interval))
+        (car interval)
+        (cdr interval)))
+  (define (lower-bound interval)
+    (if (< (car interval) (cdr interval))
+        (car interval)
+        (cdr interval)))
+
+#+END_SRC
+
+* Exercise2.8
+对于两个区间的减法来说, 最大值为减数的上界减去被减数的下界, 最小值为减数的下界
+减去被减数的上界. 具体定义如下:
+#+Name sub-interval.scm
+#+BEGIN_SRC scheme
+  (define (sub-interval x y)
+    (make-interval (- (upper-bound x) (lower-bound y))
+                   (- (lower-bound x) (upper-bound y))))
+#+END_SRC
+
+* Exercise2.9
+我们可以通过一般化的推导来证明题中的结论:
+
+假设两个区间分别为 =(a1, b1)=, =(a2, b2)=, 则它们的和为 =(a1 + a2, b1 + b2)=,两
+个区间的宽度分别为 =b1 - a1=, =b2 - a2=, 而它们和的宽度为 =(b1 + b2) - (a1 +
+a2) = (b1 - a1) + (b2 - a2)=, 即两个区间的和的宽度等于两个区间宽度的和. 减法的过
+程同样如此, 上述两个区间的差为 =(a1 - b2, b1 - a2)=, 它们差的宽度为 =(b1 -
+a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两个区间宽度的差.
+
+对于乘和除而言并不满足这样的关系, 例如区间 =(1, 4)= 和 =(3, 9)= 的区间宽度分别
+为 =3= 和 =6=, 它们的乘积为 =(3, 36)=, 乘积宽度为 =33=, 而宽度的乘积为 =18=; 它
+们的商为 =(1/9, 4/3)=, 商宽度为 =10/9=, 而宽度的商为 =1/2=.
+
+* Exercise2.10
+修正 =div-interval= 的过程为:
+#+Name: div-interval.scm
+#+BEGIN_SRC scheme
+  (define (div-interval x y)
+    (if (<= 0 (* (upper-bound y) (lower-bound y)))
+        (error "The interval contains zeros in divider")
+        (mul-interval x
+                      (make-interval (/ 1.0 (upper-bound y))
+                                     (/ 1.0 (lower-bound y))))))
+#+END_SRC
+
+* TODO Exercise2.11
+重写 =mul-interval= 的过程如下:
+#+Name: mul-interval.scm
+#+BEGIN_SRC scheme
+#+END_SRC
+
+* Exercise2.12
+=make-center-percent= 的过程定义如下:
+#+Name: center-percent.scm
+#+BEGIN_SRC scheme
+  (define (make-center-percent c p)
+    (make-interval (- c (* c p))
+                   (+ c (* c p))))
+  (define (center i)
+    (/ (+ (lower-bound i) (upper-bound i)) 2))
+  (define (percent i)
+    (/ (/ (- (upper-bound i) (lower-bound i)) 2)
+       (/ (+ (upper-bound i) (lower-bound i)) 2)))
+#+END_SRC
+
+* Exercise2.13
+设两个区间分别为 =(x - ax, x + ax)=, =(y - by, y + by)=, 它们的乘积宽度为
+=(xy + axy + bxy + abxy) - (xy - axy - bxy + abxy) = 2(a + b)xy=, 当百分比很小时,
+乘积本身可看做 =(xy - (a + b)xy, xy + (a + b)xy)=, 所以两个被乘区间的百分误差可
+看做各自百分误差之和.
