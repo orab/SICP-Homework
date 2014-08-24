@@ -541,3 +541,38 @@ TODO: 图形化显示对应的盒状指针结构.
           (append rest (map (lambda (x) (cons (car s) x)) rest)))))
 #+END_SRC
 一个集合的所有子集可以看作是包含第一个元素的子集和不包含第一个元素的子集的总和.
+
+* Exercise2.33
+完整的表达式如下:
+#+Name: Solutions
+#+BEGIN_SRC scheme
+  ;; 1)
+  (define (map p sequence)
+    (accumulate (lambda (x y) (cons (p x) y)) '() sequence))
+
+  ;; 2)
+  (define (append seq1 seq2)
+    (accumulate cons seq2 seq1))
+
+  ;; 3)
+  (define (length sequence)
+    (accumulate (lambda (x y) (+ 1 y)) 0 sequence))
+#+END_SRC
+
+* Exercise2.34
+利用Horner规则求多项式值的完整过程定义如下:
+#+Name: horner-eval.scm
+#+BEGIN_SRC scheme
+  (define (horner-eval x coefficient-sequence)
+    (accumulate (lambda (this-coeff higher-terms)
+                  (+ this-coeff (* x higher-terms)))
+                0
+                coefficient-sequence))
+#+END_SRC
+
+* TODO Exercise2.35
+用累积的形式重新定义 =count-leaves= 的过程如下:
+#+Name: count-leaves.scm
+#+BEGIN_SRC scheme
+
+#+END_SRC
