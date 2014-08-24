@@ -496,3 +496,48 @@ TODO: 图形化显示对应的盒状指针结构.
      (define (branch-structure branch)
        (cdr branch))
    #+END_SRC
+
+* Exercise2.30
+使用递归定义 =square-tree= 的过程如下:
+#+Name: square-tree.scm
+#+BEGIN_SRC scheme
+  (define (square-tree tree)
+    (cond ((null? tree) '())
+          ((not (pair? tree)) (square tree))
+          (else (cons (square-tree (car tree))
+                      (square-tree (cdr tree))))))
+#+END_SRC
+使用 =map= 定义 =square-tree= 的过程如下:
+#+Name: square-tree.scm
+#+BEGIN_SRC scheme
+  (define (square-tree tree)
+    (map (lambda (subtree)
+           (if (pair? subtree)
+               (square-tree subtree)
+               (square subtree)))
+         tree))
+#+END_SRC
+
+* Exercise2.31
+利用 =map= 做进一步的抽象过程 =tree-map=, 过程定义如下:
+#+Name: tree-map.scm
+#+BEGIN_SRC scheme
+  (define (tree-map func tree)
+    (map (lambda (subtree)
+           (if (pair? subtree)
+               (tree-map func subtree)
+               (func subtree)))
+         tree))
+#+END_SRC
+
+* Exercise2.32
+过程 =subsets= 的完整定义如下:
+#+Name: subsets.scm
+#+BEGIN_SRC scheme
+  (define (subsets s)
+    (if (null? s)
+        (list '())
+        (let ((rest (subsets (cdr s))))
+          (append rest (map (lambda (x) (cons (car s) x)) rest)))))
+#+END_SRC
+一个集合的所有子集可以看作是包含第一个元素的子集和不包含第一个元素的子集的总和.
