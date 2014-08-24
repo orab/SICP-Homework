@@ -1,7 +1,7 @@
 #+TITLE: SICP Solutions: Chapter2
 #+AUTHOR: Orab
 #+STARTUP: indent
-#+TODO: TODO TOVERIFY |
+#+TODO: TODO TOVERIFY | VERIFIED
 
 * Exercise2.1
 对于一个分数而言, 只有当分子分母同时取负时值不变, 所以如果要保证分母始终为正值,
@@ -191,7 +191,7 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
 #+Name: div-interval.scm
 #+BEGIN_SRC scheme
   (define (div-interval x y)
-    (if (<= 0 (* (upper-bound y) (lower-bound y)))
+    (if (>= 0 (* (upper-bound y) (lower-bound y)))
         (error "The interval contains zeros in divider")
         (mul-interval x
                       (make-interval (/ 1.0 (upper-bound y))
@@ -223,3 +223,146 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
 =(xy + axy + bxy + abxy) - (xy - axy - bxy + abxy) = 2(a + b)xy=, 当百分比很小时,
 乘积本身可看做 =(xy - (a + b)xy, xy + (a + b)xy)=, 所以两个被乘区间的百分误差可
 看做各自百分误差之和.
+
+* TOVERIFY Exercise2.14
+1. 通过程序验证, 得到的输出如下:
+   #+Name: Output
+   #+BEGIN_SRC
+     scheme@(guile-user)> (define r1 (make-interval 2 4))
+     scheme@(guile-user)> (define r2 (make-interval 3 8))
+     scheme@(guile-user)> (par1 r1 r2)
+     $1 = (0.5 . 6.4)
+     scheme@(guile-user)> (par2 r1 r2)
+     $2 = (1.2000000000000002 . 2.6666666666666665)
+
+   #+END_SRC
+   可以看到两种方式所得到的结果完全不同.
+
+2. 按照中心-百分比形式进行除法检验的输出为:
+   #+Name: Output
+   #+BEGIN_SRC
+     scheme@(guile-user)> (define A (make-interval 60 62))
+     scheme@(guile-user)> (define B (make-interval 30 33))
+     scheme@(guile-user)> (div-interval A A)
+     $1 = (0.967741935483871 . 1.0333333333333332)
+     scheme@(guile-user)> (div-interval A B)
+     $2 = (1.8181818181818183 . 2.0666666666666664)
+     scheme@(guile-user)> (define A (make-center-percent 60 0.01))
+     scheme@(guile-user)> (define B (make-center-percent 30 0.02))
+     scheme@(guile-user)> (define r1 (div-interval A A))
+     scheme@(guile-user)> (center r1)
+     $3 = 1.000200020002
+     scheme@(guile-user)> (percent r1)
+     $4 = 0.019998000199980024scheme
+     @(guile-user)> (define r2 (div-interval A B))
+     scheme@(guile-user)> (center r2)
+     $5 = 2.001200480192077
+     scheme@(guile-user)> (percent r2)
+     $6 = 0.02999400119976012
+
+   #+END_SRC
+   可以看出两个相同区间作除法并没有得到理论上的标准单位元. 商的误差百分比大致相
+   当于被除数和除数的误差百分比之和, 即所做运算使误差区间增大.
+
+* TODO Exercise2.15
+* TODO Exercise2.16
+* Exercise2.17
+过程 =last-pair= 的定义如下:
+#+Name: last-pair.scm
+#+BEGIN_SRC scheme
+  (define (last-pair list)
+    (if (null? (cdr list))
+        list
+        (last-pair (cdr list))))
+#+END_SRC
+
+* Exercise2.18
+过程 =reverse= 的定义如下:
+#+Name reverse.scm
+#+BEGIN_SRC scheme
+  (define (reverse list)
+    (define (reverse-iter list rlist)
+      (if (null? list)
+          rlist
+          (reverse-iter (cdr list)
+                        (cons (car list) rlist))))
+    (reverse-iter list '()))
+#+END_SRC
+
+* Exercise2.19
+兑换零钱方式计数的改进版本定义如下:
+#+Name: cc.scm
+#+BEGIN_SRC scheme
+  (define us-coins (list 50 25 10 5 1))
+  (define uk-coins (list 100 50 20 10 5 2 1 0.5))
+
+  (define (cc amount coin-values)
+    (cond ((= amount 0) 1)
+          ((or (< amount 0) (no-more? coin-values)) 0)
+          (else
+           (+ (cc amount
+                  (except-first-denomination coin-values))
+              (cc (- amount
+                     (first-denomination coin-values))
+                  coin-values)))))
+
+  (define (no-more? coin-values)
+    (null? coin-values))
+
+  (define (except-first-denomination coin-values)
+    (cdr coin-values))
+
+  (define (first-denomination coin-values)
+    (car coin-values))
+#+END_SRC
+表 =coin-values= 的排列顺序不会影响cc给出的答案, 因为
+=except-first-denomination= 和 =first-denomination= 的过程包含了所有可能的情况,
+即任何一种可能的情况要么出现在第一种情况中, 要么出现在第二种情况中, 而与顺序无关.
+
+* Exercise2.20
+过程 =same-parity= 的定义如下:
+#+Name: same-parity.scm
+#+BEGIN_SRC scheme
+  (define (same-parity x . list)
+    (let ((same? (if (even? x)
+                     even?
+                     odd?)))
+      (define (parity list)
+        (cond ((null? list) '())
+              ((same? (car list))
+               (cons (car list) (parity (cdr list))))
+              (else (parity (cdr list)))))
+      (cons x (parity list))))
+#+END_SRC
+
+* Exercise2.21
+过程 =square-list= 的两个定义的补全如下:
+#+Name: square-list.scm
+#+BEGIN_SRC scheme
+  (define (square-list items)
+    (if (null? items)
+        '()
+        (cons (square (car items))
+              (square-list (cdr items)))))
+
+  (define (square-list items)
+    (map (lambda (x) (square x))
+         items))
+#+END_SRC
+
+* Exercise2.22
+1. 按第一种方式产生出的结果中, 因为items中先被取出(car)的元素会先被加入结果的表
+   中, 这样原表中的元素在新表中会在与之对称的位置, 即元素的顺序正好相反.
+2. 按照第二种方式, 说得结果中每个cons的第二个元素都指向一个实际值, 与表定义所要
+   求的正好相反.
+
+* Exercise2.23
+过程 =for-each= 的一个实现如下:
+#+Name: for-each.scm
+#+BEGIN_SRC scheme
+  (define (for-each f items)
+    (cond ((null? items) #t)
+          (else
+           (f (car items))
+           (for-each f (cdr items)))))
+#+END_SRC
