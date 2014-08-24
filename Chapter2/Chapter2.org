@@ -281,12 +281,10 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
 #+Name reverse.scm
 #+BEGIN_SRC scheme
   (define (reverse list)
-    (define (reverse-iter list rlist)
-      (if (null? list)
-          rlist
-          (reverse-iter (cdr list)
-                        (cons (car list) rlist))))
-    (reverse-iter list '()))
+    (if (null? list)
+        '()
+        (append (reverse (cdr list))
+              (cons (car list) '()))))
 #+END_SRC
 
 * Exercise2.19
@@ -366,3 +364,135 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
            (f (car items))
            (for-each f (cdr items)))))
 #+END_SRC
+
+* TODO Exercise2.24
+解释器打印的结果为 =(1 (2 (3 4)))=.
+TODO: 图形化显示对应的盒状指针结构.
+
+* Exercise2.25
+从下面各表中取出7的 =car= 和 =cdr= 的组合为:
+#+Name: Solutions
+#+BEGIN_SRC scheme
+  ;; (1 3 (5 7) 9)
+  (define x '(1 3 (5 7) 9))
+  (car (cdr (car (cdr (cdr x)))))
+
+  ;; ((7))
+  (define y '((7)))
+  (car (car y))
+
+  ;; (1 (2 (3 (4 (5 (6 7))))))
+  (define z '(1 (2 (3 (4 (5 (6 7)))))))
+  (car (cdr (car (cdr (car (cdr (car (cdr (car (cdr (car (cdr z))))))))))))
+#+END_SRC
+
+* Exercise2.26
+各个表达式的打印结果如下:
+#+Name: Solutions
+#+BEGIN_SRC scheme
+  ;; x: (1 2 3) y: (4 5 6)
+
+  ;; (append x y)
+  (1 2 3 4 5 6)
+
+  ;; (cons x y)
+  ((1 2 3) 4 5 6)
+
+  ;; (list x y)
+  ((1 2 3) (4 5 6))
+#+END_SRC
+
+* Exercise2.27
+过程 =deep-reverse= 的定义如下:
+#+Name: deep-reverse.scm
+#+BEGIN_SRC scheme
+  (define (deep-reverse tree)
+    (cond ((null? tree) '())
+          ((not (pair? tree)) tree)
+          (else (append (deep-reverse (cdr tree))
+                        (cons (deep-reverse (car tree))
+                              '())))))
+#+END_SRC
+
+* Exercise2.28
+过程 =fringe= 的定义如下:
+#+Name: fringe.scm
+#+BEGIN_SRC scheme
+  (define (fringe tree)
+    (cond ((null? tree) '())
+          ((not (pair? (car tree)))
+           (cons (car tree) (fringe (cdr tree))))
+          (else (append (fringe (car tree))
+                        (fringe (cdr tree))))))
+#+END_SRC
+
+* Exercise2.29
+1. =branch= 的一些简单操作定义如下:
+   #+Name: branch.scm
+   #+BEGIN_SRC scheme
+     (define (make-mobile left right)
+       (list left right))
+
+     (define (make-branch length structure)
+       (list length structure))
+
+     (define (left-branch mobile)
+       (car mobile))
+
+     (define (right-branch mobile)
+       (car (cdr mobile)))
+
+     (define (branch-length branch)
+       (car branch))
+
+     (define (branch-structure branch)
+       (car (cdr branch)))
+   #+END_SRC
+2. 过程 =total-weight= 的定义如下:
+   #+Name: total-weight.scm
+   #+BEGIN_SRC scheme
+     (define (total-weight mobile)
+       (cond ((null? mobile) 0)
+             ((not (pair? mobile)) mobile)
+             (else
+              (+ (total-weight
+                  (branch-structure (left-branch mobile)))
+                 (total-weight
+                  (branch-structure (right-branch mobile)))))))
+   #+END_SRC
+3. 检查一个二叉活动体是否平衡的过程 =balance?= 的定义如下:
+   #+Name: balance?.scm
+   #+BEGIN_SRC scheme
+     (define (balance? mobile)
+       (if (or (null? mobile) (not (pair? mobile)))
+           #t
+           (and (= (* (branch-length (left-branch mobile))
+                      (total-weight
+                       (branch-structure (left-branch mobile))))
+                   (* (branch-length (right-branch mobile))
+                      (total-weight
+                       (branch-structure (right-branch mobile)))))
+                (balance? (branch-structure (left-branch mobile)))
+                (balance? (branch-structure (right-branch mobile))))))
+   #+END_SRC
+4. 如果改变活动体的构造方式, 要保持程序仍旧可用, 只需修改对应的选择函数即可:
+   #+Name: branch-modified.scm
+   #+BEGIN_SRC scheme
+     (define (make-mobile left right)
+       (cons left right))
+
+     (define (make-branch length structure)
+       (cons length structure))
+
+     (define (left-branch mobile)
+       (car mobile))
+
+     (define (right-branch mobile)
+       (cdr mobile))
+
+     (define (branch-length branch)
+       (car branch))
+
+     (define (branch-structure branch)
+       (cdr branch))
+   #+END_SRC
