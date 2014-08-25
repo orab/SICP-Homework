@@ -570,9 +570,68 @@ TODO: 图形化显示对应的盒状指针结构.
                 coefficient-sequence))
 #+END_SRC
 
-* TODO Exercise2.35
+* Exercise2.35
 用累积的形式重新定义 =count-leaves= 的过程如下:
 #+Name: count-leaves.scm
 #+BEGIN_SRC scheme
+  (define (count-leaves t)
+    (accumulate + 0
+                (map (lambda (x) 1) (fringe t))))
+#+END_SRC
 
+* Exercise2.36
+完整的 =accumulate-n= 定义如下:
+#+Name: accumulate-n.scm
+#+BEGIN_SRC scheme
+  (define (accumulate-n op init seqs)
+    (if (null? (car seqs))
+        '()
+        (cons (accumulate op init (map car seqs))
+              (accumulate-n op init (map cdr seqs)))))
+#+END_SRC
+
+* Exercise2.37
+矩阵运算基本操作的完整定义如下:
+#+Name: matrix-op.scm
+#+BEGIN_SRC scheme
+  (define (dot-product v w)
+    (accumulate + 0 (map * v w)))
+
+  (define (matrix-*-vector m v)
+    (map (lambda (x) (dot-product x v)) m))
+
+  (define (transpose mat)
+    (accumulate-n cons '() mat))
+
+  (define (matrix-*-matrix m n)
+    (let ((cols (transpose n)))
+      (map (lambda (x) (matrix-*-vector cols x)) m)))
+#+END_SRC
+
+* Exercise2.38
+下列各式的值依次为:
+#+Name: Solutions
+#+BEGIN_SRC scheme
+  ;; (fold-right / 1 (list 1 2 3))
+  3/2
+
+  ;; (fold-left / 1 (list 1 2 3))
+  1/6
+
+  ;; (fold-right list nil (list 1 2 3))
+  (1 (2 (3 ())))
+
+  ;; (fold-left list nil (list 1 2 3))
+  (((() 1) 2) 3)
+#+END_SRC
+
+* Exercise2.39
+分别基于 =fold-right= 和 =fold-left= 定义 =reverse= 的过程如下:
+#+Name: reverse.scm
+#+BEGIN_SRC scheme
+  (define (reverse sequence)
+    (fold-right (lambda (x y) (append y (list x))) '() sequence))
+
+  (define (reverse sequence)
+    (fold-left (lambda (x y) (cons y x)) '() sequence))
 #+END_SRC
