@@ -7,5 +7,5 @@ These are my answers about "Structure and Interpretation of Computer
 Programs".
 
 * Menu
-[[file:Chapter1/Chapter1.org][Chapter 1]]
-[[file:Chapter2/Chapter2.org][Chapter 2]]
+- [[./Chapter1/Chapter1.org][Chapter 1]]
+- [[./Chapter2/Chapter2.org][Chapter 2]]
