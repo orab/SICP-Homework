@@ -55,3 +55,7 @@
 
 (define (flatmap proc seq)
   (accumulate append '() (map proc seq)))
+
+(define (remove item sequence)
+  (filter (lambda (x) (not (= x item)))
+          sequence))

@@ -635,3 +635,90 @@ TODO: 图形化显示对应的盒状指针结构.
   (define (reverse sequence)
     (fold-left (lambda (x y) (cons y x)) '() sequence))
 #+END_SRC
+
+* Exercise2.40
+过程 =unique-pairs= 的定义如下:
+#+Name: unique-pairs.scm
+#+BEGIN_SRC scheme
+  (define (unique-pairs n)
+    (flatmap (lambda (i)
+               (map (lambda (j) (list i j))
+                    (enumerate-interval 1 (- i 1))))
+             (enumerate-interval 1 n)))
+
+  (define (enumerate-interval beg end)
+    (cond ((> beg end) '())
+          ((= beg end) (list end))
+          (else (cons beg (enumerate-interval (+ beg 1) end)))))
+#+END_SRC
+用 =unique-pairs= 简化 =prime-sum-pairs= 的定义如下:
+#+Name: prime-sum-pairs.scm
+#+BEGIN_SRC scheme
+  (define (prime-sum-pairs n)
+    (map make-pair-sum
+         (filter prime-sum? (unique-pairs n))))
+
+  (define (prime-sum? pair)
+    (prime? (+ car pair) (cadr pair)))
+
+  (define (make-pair-sum pair)
+    (list (car pair) (cadr pair) (+ (car pair) (cadr pair))))
+#+END_SRC
+
+* Exercise2.41
+过程 =fixed-sum-tuples= 的定义如下:
+#+Name: fixed-sum-tuples.scm
+#+BEGIN_SRC scheme
+  (define (fixed-sum-tuples n s)
+    (filter (lambda (t)
+              (= s (+ (car t) (cadr t) (caddr t))))
+            (flatmap (lambda (i)
+                       (flatmap (lambda (j)
+                                  (map (lambda (k) (list i j k))
+                                       (remove j
+                                               (remove i (enumerate-interval 1 n)))))
+                                (remove i (enumerate-interval 1 n))))
+                     (enumerate-interval 1 n))))
+
+#+END_SRC
+
+* Exercise2.42
+解决八皇后问题的完整过程定义如下:
+#+Name: queens.scm
+#+BEGIN_SRC scheme
+  (define (queens board-size)
+    (define (queen-cols k)
+      (if (= k 0)
+          (list empty-board)
+          (filter
+           (lambda (positions) (safe? k positions))
+           (flatmap
+            (lambda (rest-of-queens)
+              (map (lambda (new-row)
+                     (adjoin-position new-row k rest-of-queens))
+                   (enumerate-interval 1 board-size)))
+            (queen-cols (- k 1))))))
+    (queen-cols board-size))
+
+  (define (adjoin-position new-row k rest-queens)
+    (cons new-row rest-queens))
+
+  (define empty-board '())
+
+  (define (safe? k positions)
+    (define (iter cur i rest)
+      (if (= i k)
+          #t
+          (and (not (= cur (car rest)))
+               (not (= (- cur i) (car rest)))
+               (not (= (+ cur i) (car rest)))
+               (iter cur (+ i 1) (cdr rest)))))
+    (iter (car positions) 1 (cdr positions)))
+#+END_SRC
+
+* Exercise2.43
+假设执行一次 =adjoin-position= 的时间为单位时间, 当我们采用Exercise2.42中的过程
+时, 有 =T(n) = T(n - 1) + a(n - 1) * k=, 其中 =T(n)= 表示 =k = n= 的运行时间,
+=a(n)= 表示 =(queen-cols n)= 的长度. 当交换嵌套映射的顺序后, 运行时间 =T'(n) =
+s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去解决八皇后问题
+时, 时间消耗大致为 =8^8 * T=.
