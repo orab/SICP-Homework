@@ -899,3 +899,46 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
 #+END_SRC
 
 * TODO Exercise2.52
+
+* Exercise2.53
+下列各个表达式的值分别为:
+#+Name: Solutions
+#+BEGIN_SRC scheme
+  ;; (list 'a 'b 'c)
+  (a b c)
+
+  ;; (list (list 'george))
+  ((george))
+
+  ;; (cdr '((x1 x2) (y1 y2)))
+  ((y1 y2))
+
+  ;; (cadr '((x1 x2) (y1 y2)))
+  (y1 y2)
+
+  ;; (pair? (car '(a short list)))
+  #f
+
+  ;; (memq 'red '((red shoes) (blue socks)))
+  #f
+
+  ;; (memq 'red '(red shoes blue socks))
+  (red shoes blue socks)
+#+END_SRC
+
+* Exercise2.54
+过程 =equal?= 的定义如下:
+#+Name: equal?.scm
+#+BEGIN_SRC scheme
+  (define (equal? x y)
+    (cond ((and (null? x) (null? y)) #t)
+          ((and (pair? (car x)) (pair? (car y)))
+           (and (equal? (car x) (car y))
+                (equal? (cdr x) (cdr y))))
+          (else (and (eq? (car x) (car y))
+                (equal? (cdr x) (cdr y))))))
+#+END_SRC
+
+* Exercise2.55
+表达式 =(car ''abracadabra)= 等价于 =(car (quote (quote abracadabra)))=, 即对列
+表 =(quote abracadabra)= 做 =car= 操作, 因此返回结果为 =quote=.
