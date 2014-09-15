@@ -942,3 +942,157 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
 * Exercise2.55
 表达式 =(car ''abracadabra)= 等价于 =(car (quote (quote abracadabra)))=, 即对列
 表 =(quote abracadabra)= 做 =car= 操作, 因此返回结果为 =quote=.
+
+* Exercise2.56
+添加幂函数后的求导过程定义如下:
+#+Name: exponentiation.scm
+#+BEGIN_SRC scheme
+  (define (make-exponentiation u n)
+    (cond ((=number? n 0) 1)
+          ((=number? n 1) u)
+          (else (list '** n u))))
+
+  (define (exponentiation? exp)
+    (and (pair? exp) (eq? (car exp) '**)))
+
+  (define (base exp)
+    (cadr exp))
+
+  (define (exponent exp)
+    (caddr exp))
+
+  (define (deriv exp var)
+    (cond ((number? exp) 0)
+          ((variable? exp)
+           (if (same-variable? exp var) 1 0))
+          ((sum? exp)
+           (make-sum (deriv (addend exp) var)
+                     (deriv (augend exp) var)))
+          ((product? exp)
+           (make-sum
+            (make-product (multiplier exp)
+                          (deriv (multiplicand exp) var))
+            (make-product (deriv (multiplier exp) var)
+                          (multiplicand exp))))
+          ((exponentiation? exp)
+           (make-product
+            (make-product (exponent exp)
+                          (make-exponentiation (base exp)
+                                               (- (exponent exp) 1)))
+            (deriv (base exp) var)))
+          (else
+           (error "unknown expression type -- DERIV" exp))))
+           #+END_SRC
+
+* Exercise2.57
+经过改进的能处理任意项的和与乘积的求导程序定义如下:
+#+Name: deriv-ex.scm
+#+BEGIN_SRC scheme
+  (define (make-sum . slist)
+    (cons '+ slist))
+  (define (make-product . plist)
+    (cons '* plist))
+
+  (define (addend s) (cadr s))
+
+  (define (augend s)
+    (if (= (length s) 3)
+        (caddr s)
+        (cons '+ (cddr s))))
+
+  (define (multiplier p) (cadr p))
+
+  (define (multiplicand p)
+    (if (= (length p) 3)
+        (caddr p)
+        (cons '* (cddr p))))
+#+END_SRC
+
+* TODO Exercise2.58
+1. 采用中缀表达式定义谓词, 选择函数和构造函数的过程定义如下:
+   #+Name: infix-deriv.scm
+   #+BEGIN_SRC scheme
+     (define (make-sum a1 a2)
+       (cond ((=number? a1 0) a2)
+             ((=number? a2 0) a1)
+             ((and (number? a1) (number? a2)) (+ a1 a2))
+             (else (list a1 '+ a2))))
+     (define (make-product m1 m2)
+       (cond ((or (=number? m1 0) (=number? m2 0)) 0)
+             ((=number? m1 1) m2)
+             ((=number? m2 1) m1)
+             ((and (number? m1) (number? m2)) (* m1 m2))
+             (else (list m1 '* m2))))
+
+     (define (sum? s)
+       (and (pair? s) (eq? (cadr s) '+)))
+
+     (define (product? p)
+       (and (pair? p) (eq? (cadr p) '*)))
+
+     (define (addend s) (car s))
+     (define (augend s) (caddr s))
+
+     (define (multiplier p) (car p))
+     (define (multiplicand p) (caddr p))
+   #+END_SRC
+2. TODO 标准代数写法(中缀)的表示
+
+* Exercise2.59
+采用未排序的集合实现 =union-set= 的定义如下:
+#+Name: union-set.scm
+#+BEGIN_SRC scheme
+  (define (union-set set1 set2)
+    (cond ((not (element-of-set? (car set1) set2))
+           (cons (car set1) set2))
+          (else (union-set (cdr set1) set2))))
+#+END_SRC
+
+* Exercise2.60
+允许重复的集合操作定义如下:
+#+Name: multi-set.scm
+#+BEGIN_SRC scheme
+  (define (element-of-set? x set)
+    (cond ((null? set) #f)
+          ((equal? x (car set)) #t)
+          (else (element-of-set? x (cdr set)))))
+
+  (define (adjoin-set x set)
+    (cons x set))
+
+  (define (union-set set1 set2)
+    (append set1 set2))
+
+  (define (intersection-set set1 set2)
+    (cond ((or (null? set1) (null? set2)) '())
+          ((element-of-set? (car set1) set2)
+           (cons (car set1)
+                 (intersection-set (cdr set1) set2)))
+          (else (intersection-set (cdr set1) set2))))
+#+END_SRC
+其中 =element-of-set?= 和 =intersection-set= 操作依然需要遍历表, 由于允许元素重
+复, 表长度相应增大, 所以这两项操作效率变低, 而 =adjoin-set= 和 =union-set= 操作
+仅需常数时间即可完成. 当具体应用中操作大多数为添加和并操作时更倾向于使用该种表示.
+
+* Exercise2.61
+=adjoin-set= 依然使用 =element-of-set?= 来实现, 由于 =element-of-set?= 平均所需步数为采用未排序时表示的一半, =adjoin-set= 也为一半.
+
+* Exercise2.62
+在集合的排序表示上的一个\Theta(n)的实现如下:
+#+Name: union-set.csm
+#+BEGIN_SRC scheme
+  (define (union-set set1 set2)
+    (cond ((null? set1) set2)
+          ((null? set2) set1)
+          (else (let ((x1 (car set1)) (x2 (car set2)))
+                  (cond ((= x1 x2)
+                         (cons x1
+                               (union-set (cdr set1)
+                                          (cdr set2))))
+                        ((< x1 x2)
+                         (cons x1
+                               (union-set (cdr set1) set2)))
+                        ((< x2 x1)
+                         (cons x2
+                               (union-set set1 (cdr set2)))))))))
+#+END_SRC
