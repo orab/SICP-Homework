@@ -1096,3 +1096,130 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
                          (cons x2
                                (union-set set1 (cdr set2)))))))))
 #+END_SRC
+
+* TODO Exercise2.63
+1. 这两个过程都产生树的中序遍历结果.
+2. 两个过程做了相同数量的 =cons= 操作, 具有同样量级的增长速度.
+
+* Exercise2.64
+1. =partial-tree= 在每次递归时将所有结点分为两半, 这样保证了对于生成树的任意一
+   个结点, 其左子树与右子树结点数差不超过1, 因此该生成树是平衡二叉树. 将
+   =paritial-tree= 用于表 =(1 3 5 7 9)= 产生的树为:
+   #+Name: Output
+   #+BEGIN_SRC scheme
+     (5 (1 ()
+           (3 ()
+              ()))
+        (9 (7 ()
+              ())
+           (11 ()
+               ())))
+   #+END_SRC
+2. 由程序的递归关系可得 =T(n) = 2 * T(n / 2) + \Theta(1)=, 所以转换n个元素的表
+   所需的步数以 \Theta(n) 为量级.
+
+* TODO Exercise2.65
+TODO 实现基于平衡二叉树版本的交集和并集操作.
+
+* Exercise2.66
+对于采用二叉树实现的集合, 定义 =lookup= 过程如下:
+#+Name: lookup.scm
+#+BEGIN_SRC scheme
+  (define (lookup given-key set-of-records)
+    (cond ((null? set-of-records) #f)
+          ((= given-key (key (car set-of-records)))
+           (car set-of-records))
+          ((< given-key (key (car set-of-records)))
+           (lookup (left-branch set-of-records)))
+          (else (lookup (right-branch set-of-records)))))
+#+END_SRC
+
+* Exercise2.67
+定义样例编码树和样例消息如下:
+#+Name: sample.scm
+#+BEGIN_SRC scheme
+  (define sample-tree
+    (make-code-tree (make-leaf 'A 4)
+                    (make-code-tree
+                     (make-leaf 'B 2)
+                     (make-code-tree (make-leaf 'D 1)
+                                     (make-leaf 'C 1)))))
+
+  (define sample-message '(0 1 1 0 0 1 0 1 0 1 1 1 0))
+#+END_SRC
+使用过程 =decode= 得到的编码结果为:
+#+Name: Output
+#+BEGIN_SRC
+  scheme@(guile-user)> (decode sample-message sample-tree)
+  $1 = (A D A B B C A)
+
+#+END_SRC
+
+* Exercise2.68
+过程 =encode= 的定义如下:
+#+Name: encode.scm
+#+BEGIN_SRC scheme
+  (define (encode message tree)
+    (if (null? message)
+        '()
+        (append (encode-symbol (car message) tree)
+                (encode (cdr message) tree))))
+
+  (define (encode-symbol symbol tree)
+    (cond ((leaf? tree) '())
+          ((contains? symbol (symbols (left-branch tree)))
+           (cons 0 (encode-symbol symbol (left-branch tree))))
+          ((contains? symbol (symbols (right-branch tree)))
+           (cons 1 (encode-symbol symbol (right-branch tree))))
+          (else (error "unknow symbol" symbol))))
+
+  (define (contains? e list)
+    (cond ((null? list) #f)
+          ((eq? e (car list)) #t)
+          (else (contains? e (cdr list)))))
+#+END_SRC
+
+* Exercise2.69
+根据符号-频度对偶表生成Huffman编码树的过程实现如下:
+#+Name: generate-huffman-tree.scm
+#+BEGIN_SRC scheme
+  (define (generate-huffman-tree pairs)
+    (successive-merge (make-leaf-set pairs)))
+
+  (define (successive-merge set)
+    (cond ((null? (cddr set))
+           (make-code-tree (car set) (cadr set)))
+          (else
+           (successive-merge
+            (adjoin-set (make-code-tree (car set) (cadr set))
+                        (cddr set))))))
+#+END_SRC
+
+* Exercise2.70
+定义8个符号的字母频度表和文本消息:
+#+Name: Exercise
+#+BEGIN_SRC scheme
+  (define pairs
+    '((a 2) (na 16) (boom 1) (sha 3) (get 2) (yip 9) (job 2) (wah 1)))
+
+  (define message
+    '(get a job sha na na na na na na na na get a job sha na na na na na na
+          na na wah yip yip yip yip yip yip yip yip yip sha boom))
+#+END_SRC
+利用huffman编码过程生成的编码为:
+#+Name: Output
+#+BEGIN_SRC
+  scheme@(guile-user)> (encode message (generate-huffman-tree pairs))
+  $1 = (1 1 1 1 1 1 1 0 0 1 1 1 1 0 1 1 1 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 0 0 1 1 1 1 0 1 1 1 0 0 0 0 0 0 0 0 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1 0 1 1 0 1 1)
+
+#+END_SRC
+这一编码一共使用了88个二进制位. 若采用定长编码, 每个符号需要3个二进制位, 完成这
+个歌曲最少需要 =36 * 4 = 144= 个二进制位.
+
+* Exercise2.71
+对于这样的编码, 出现最频繁的符号要用1个二进制位表示, 最不频繁的符号要用 =n - 1=
+个二进制位表示.
+
+* Exercise2.72
+当符号的相对频率满足如2.71中所描述的规则时, 编码最频繁的符号所需的步数的增长速
+率为 \Theta(1), 最不频繁的符号所需步数的增长速率为 \Thead(n^2).
