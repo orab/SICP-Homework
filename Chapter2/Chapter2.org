@@ -1223,3 +1223,83 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 * Exercise2.72
 当符号的相对频率满足如2.71中所描述的规则时, 编码最频繁的符号所需的步数的增长速
 率为 \Theta(1), 最不频繁的符号所需步数的增长速率为 \Thead(n^2).
+
+* Exercise2.73
+1. 数据导向的求导程序根据表达式的操作类型的不同选择不同的求导过程. 由于数字和符
+   号并非一种操作, 所以无法将 =number?= 和 =same-variable?= 也加入数据导向分派中.
+2. 针对和式和积式的求导过程实现如下:
+   #+Name: deriv1.scm
+   #+BEGIN_SRC scheme
+     (define (install-deriv-package)
+       (define (deriv-sum exp var)
+         (make-sum (deriv (addend exp) var)
+                   (deriv (augend exp) var)))
+       (define (deriv-product exp var)
+         (make-sum
+          (make-product (multiplier exp)
+                        (deriv (multiplicand exp) var))
+          (make-product (deriv (multiplier exp) var)
+                        (multiplicand exp)))))
+
+     (put 'deriv-sum '(+) deriv-sum)
+     (put 'deriv-product '(*) deriv-product)
+   #+END_SRC
+3. TODO 添加其他操作的求导程过
+4. 求导系统不是以求导实现方式分类, 而是按操作实现方式来分类.
+
+* Exercise2.74
+通过为每个操作定义针对不同分支机构的特定版本, 然后将这些操作注册到一个统一的表
+中, 然后实现一个过程可以从该表中根据不同的分支机构选择恰当的实现来执行操作.
+1. =get-recode= 过程
+   #+Name: get-recode.scm
+   #+BEGIN_SRC scheme
+     (define (get-record file)
+       ((get 'get-record (institute file)) file))
+   #+END_SRC
+   各个独立机构的文件应该提供其机构的唯一标识.
+2. =get-salary= 过程
+   #+Name: get-salary.scm
+   #+BEGIN_SRC scheme
+     (define (get-salary file employee)
+       ((get 'get-salary (insitute file)) file employee))
+   #+END_SRC
+3. =find-employee-record= 过程
+   #+Name: find-employee-record.scm
+   #+BEGIN_SRC scheme
+     (define (find-employee-record employee-name file-list)
+       (if (null? file-list)
+           '()
+           (cons ((get 'find-employee-record (institute (car file-list)))
+                  employee-name (car file-list))
+                 (find-employee-record (cdr file-list)))))
+   #+END_SRC
+4. 要将新的人事文件结合到系统, 要将这些文件标记特定的机构标识, 还要实现现有操作
+   相应与该机构的特定版本.
+
+* Exercise2.75
+使用消息传递的方式实现 =make-from-mag-ang= 过程如下:
+#+Name: make-from-mag-ang.scm
+#+BEGIN_SRC scheme
+  (define (make-from-mag-ang m a)
+    (define (dispatch op)
+      (cond ((eq? op 'real-part)
+             (* m (cos a)))
+            ((eq? op 'imag-part)
+             (* m (sin a)))
+            ((eq? op 'magnitude) m)
+            ((eq? op 'angle) a)
+            (else
+             (error "Unknow op -- MAKE-FROM-REAL-IMAG" op))))
+    dispatch)
+#+END_SRC
+
+* Exercise2.76
+1. 显式分派风格
+   不管是加入新类型还是新操作, 都需要修改原来的通用过程;
+2. 数据导向风格
+   加入新类型或新操作不需要改变原有的程序, 只需要将对应的新操作加入表中;
+3. 消息传递风格
+   加入新类型不需要修改原有代码, 但加入新操作需要.
+
+消息传递风格最是个需要经常加入新类型的系统, 数据导向风格的组织方式最适合需要经常
+加入新操作的系统.
