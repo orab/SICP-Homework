@@ -1303,3 +1303,95 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 
 消息传递风格最是个需要经常加入新类型的系统, 数据导向风格的组织方式最适合需要经常
 加入新操作的系统.
+
+* Exercise2.77
+表达式 =(magnitude z)= 的求值过程展开如下:
+#+Name: Solutions
+#+BEGIN_SRC scheme
+  (magnitude x)
+  (apply-generic 'magnitude (contents x))
+  ((get 'magnitude '(complex)) (contents x))
+  (magnitude (contents x))
+  ((get 'magnitude '(rectangular)) (contents (contents x)))
+#+END_SRC
+其中 =apply-generic= 被调用了两次, 由于两次参数的类型不同, 实际会调用不同的过程.
+
+* Exercise2.78
+利用Scheme的内部类型系统来改进原过程:
+#+Name: scheme-number-ex.scm
+#+BEGIN_SRC scheme
+  ;; modify function: type-tag
+  (define (type-tag datum)
+    (if (pair? datum)
+        (car datum)
+        (if (number? datum)
+            'scheme-number
+            (error "Bad tagged datum -- TYPE-TAG" datum))))
+  ;; modify function: contents
+  (define (contents datum)
+    (if (pair? datum)
+        (cdr datum)
+        (if (number? datum)
+            datum
+            (error "Bad tagged datum -- CONTENTS" datum))))
+  ;; modify function: attach-tag
+  (define (attach-tag type-tag contents)
+    (if (eq? type-tag 'scheme-number)
+        contents
+        (cons type-tag contents)))
+#+END_SRC
+
+* Exercise2.79
+添加如下过程定义到 =install-scheme-number-package= 中:
+#+Name: Solutions
+#+BEGIN_SRC scheme
+  (put 'equ? '(scheme-number scheme-number)
+       (lambda (x y) (= x y)))
+#+END_SRC
+添加如下过程定义到 =install-rational-package= 中:
+#+Name: Solutions
+#+BEGIN_SRC scheme
+  (define (equ?-rat x y)
+    (= (* (numer x) (denom y))
+       (* (denom x) (numer y))))
+
+  (put 'equ? '(rational rational)
+       (lambda (x y) (equ?-rat x y)))
+#+END_SRC
+添加如下过程定义到 =install-complex-package= 中:
+#+Name: Solutions
+#+BEGIN_SRC scheme
+  (define (equ?-complex z1 z2)
+    (and (= (real-part z1) (real-part z2))
+         (= (imag-part z1) (imag-part z1)))))
+
+  (put 'equ? '(complex complex)
+       (lambda (z1 z2) (equ?-complex z1 z2)))
+#+END_SRC
+
+* Exercise2.80
+添加如下过程定义到 =install-scheme-number-package= 中:
+#+Name: Solutions
+#+BEGIN_SRC scheme
+  (put '=zero? '(scheme-number)
+       (lambda (x) (= x 0)))
+#+END_SRC
+添加如下过程定义到 =install-rational-package= 中:
+#+Name: Solutions
+#+BEGIN_SRC scheme
+  (define (=zero?-rat x)
+    (= 0 (numer x)))
+
+  (put '=zero? '(rational)
+       (lambda (x) (=zero?-rat x)))
+#+END_SRC
+添加如下过程定义到 =install-complex-package= 中:
+#+Name: Solutions
+#+BEGIN_SRC scheme
+  (define (=zero?-complex z)
+    (and (= (real-part z) 0)
+         (= (imag-part z) 0)))
+
+  (put '=zero? '(complex)
+       (lambda (z) (=zero?-complex z)))
+#+END_SRC
