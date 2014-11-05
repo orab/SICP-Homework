@@ -1,7 +1,8 @@
 #+TITLE: SICP Solutions: Chapter1
 #+AUTHOR: Orab
-#+STARTUP: indent
-#+TODO: TODO TOVERIFY |
+
+#+STARTUP: entitiespretty indent
+#+TODO: TODO TOVERIFY | VERIFIED
 
 * Exercise1.1
 依次输出的结果为:
