@@ -1,6 +1,7 @@
 #+TITLE: SICP Solutions: Chapter2
 #+AUTHOR: Orab
-#+STARTUP: indent
+
+#+STARTUP: entitiespretty indent
 #+TODO: TODO TOVERIFY | VERIFIED
 
 * Exercise2.1
@@ -1394,4 +1395,156 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 
   (put '=zero? '(complex)
        (lambda (z) (=zero?-complex z)))
+#+END_SRC
+
+* Exercise2.81
+1. 如果参数类型相同, 而在表格中又找不到相应的操作, 运用该强制过程会使得程序陷入
+   无限循环之中, 因为在找不到相应操作的时候程序会运行强制过程, 而运行强制过程之
+   后参数类型并没有发生改变, 也就是说依然不可能存在相应的操作, 所以程序会无休止
+   的重复这一过程.
+2. 如上所述, 当相同类型参数无法找到相应操作时, 该种强制并不能解决问题.
+3. 修改 =apply-generic= , 使得程序不会试着强制两个相同类型参数的实现如下:
+   #+Name: apply-generic.scm
+   #+BEGIN_SRC scheme
+     (define (apply-generic op . args)
+       (let ((type-tags (map type-tag args)))
+         (let ((proc (get op type-tags)))
+           (if proc
+               (apply proc (map contents args))
+               (if (and (= (length args) 2)
+                        (not (eq? (car type-tags)
+                                  (cadr type-tags))))
+                   (let ((type1 (car type-tags))
+                         (type2 (cadr type-tags))
+                         (a1 (car args))
+                         (a2 (cadr args)))
+                     (let ((t1->t2 (get-coercion type1 type2))
+                           (t2->t1 (get-coercion type2 type1)))
+                       (cond (t1->t2
+                              (apply-generic op (t1->t2 a1) a2))
+                             (t2->t1
+                              (apply-generic op a1 (t2->t1 a2)))
+                             (else
+                              (error "No method for these types"
+                                     (list op type-tags)))))))
+                   (error "No method for these types"
+                          (list op type-tags)))))))
+   #+END_SRC
+
+* TODO Exercise2.82
+
+* TOVERIFY Exercise2.83
+为每个类型添加 =raise= 操作的实现如下:
+#+Name: raise.scm
+#+BEGIN_SRC scheme
+  ;; in install-scheme-number-package:
+  (define (raise-to-rational  scheme-number)
+    (make-rational scheme-number 1))
+
+  ;; in install-rational-package:
+  (define (raise-to-real rational)
+    rational)
+
+  ;; in install-real-package:
+  (define (raise-to-complex real)
+    (make-from-real-imag real 0))
+
+  ;; add to table
+  (put 'raise '(scheme-number) raise-to-rational)
+  (put 'raise '(rational) raise-to-real)
+  (put 'raise '(real) raise-to-complex)
+#+END_SRC
+
+* Exercise2.84
+利用 =raise= 操作修改 =apply-generic= 过程如下:
+#+Name: apply-generic.scm
+#+BEGIN_SRC scheme
+  (define (apply-generic op . args)
+    (let ((type-tags (map tag args)))
+      (let ((proc (get op type-tags)))
+        (if proc
+            (proc (map contents args))
+            (if (= (length args) 2)
+                (let ((type1 (car type-tags))
+                      (type2 (cadr type-tags))
+                      (a1 (car args))
+                      (a2 (cadr args)))
+                  (if (and (is-top-level type1)
+                           (is-top-level type2))
+                      (error "No method for these types"
+                             (list op type-tags))
+                      (if (higher-level type1 type2)
+                          (apply-generic op type1 (raise type2))
+                          (apply-generic op (raise type1) type2))))
+                (error "No method for these types"
+                       (list op type-tags)))))))
+#+END_SRC
+
+* TODO Exercise2.85
+过程 =drop= 实现如下:
+#+Name: drop.scm
+#+BEGIN_SRC scheme
+
+#+END_SRC
+
+* TODO Exercise2.86
+
+* Exercise2.87
+为多项式定义和安装 =zero?= 过程定义如下:
+#+Name: =zero?.scm
+#+BEGIN_SRC scheme
+  (define (=zero?-poly terms)
+    (if (empty-termlist? term?)
+        #t
+        (and (=zero? (coeff (first-term terms)))
+             (=zero?-poly (rest-terms terms)))))
+
+  (put '=zero? '(polynomial) =zero?-poly)
+#+END_SRC
+
+* Exercise2.88
+定义多项式的减法过程如下:
+#+Name: sub-terms.scm
+#+BEGIN_SRC scheme
+  (define (sub-terms L1 L2)
+    (add-terms L1 (neg L2)))
+
+  ;; assume other type has defined neg operation
+  (define (neg terms)
+    (if (empty-termlist? terms)
+        (empty-termlist)
+        (let ((term (first-term terms)))
+          (adjoin-term
+           (make-term (order term)
+                      (neg (coeff term)))
+           (neg (rest-terms terms)))))
+  (put 'neg '(polynomial) neg)
+#+END_SRC
+
+* Exercise2.89
+定义适宜稠密多项式的项表表示的过程如下:
+#+Name: rich-poly.scm
+#+BEGIN_SRC scheme
+  (define (adjoin-term term term-list)
+    (cond ((=zero? (coeff term)) term-list)
+          ((= (order term) (length term-list))
+           (cons (coeff term) term-list))
+          (else
+           (adjoin-term term (cons 0 term-list)))))
+  (define (the-empty-termlist) '())
+  (define (first-term term-list)
+    (make-term (- (length term-list) 1)
+               (car term-list)))
+  (define (rest-terms term-list)
+    (let ((rest (cdr term-list)))
+      (cond ((null? rest) rest)
+            ((= 0 (car rest)) (rest-terms rest))
+            (else rest))))
+  (define (empty-termlist? term-list) (null? term-list))
+#+END_SRC
+
+* Exercise2.90
+定义一个多项式系统, 使其同时允许两种表示形式, 实现如下:
+#+Name: polynomial.scm
+#+BEGIN_SRC scheme
 #+END_SRC

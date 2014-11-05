@@ -1,0 +1,185 @@
+#+TITLE: SICP Solutions: Chapter3
+#+AUTHOR: Orab
+
+#+STARTUP: entitiespretty indent
+#+TODO: TODO TOVERIFY | VERIFIED
+
+* Exercise3.1
+生成累加器的过程 =make-accumulator= 定义如下:
+#+BEGIN_SRC scheme
+(define (make-accumulator sum)
+  (lambda (n)
+    (begin (set! sum (+ sum n))
+           sum)))
+#+END_SRC
+
+* Exercise3.2
+生成程序监视器的过程 =make-monitor= 定义如下:
+#+NAME: make-monitor.csm
+#+BEGIN_SRC scheme
+(define (make-monitor f)
+  (let ((cnt 0))
+    (define (how-many-call?)
+      cnt)
+    (define (reset-count)
+      (set! cnt 0))
+    (define (dispatch m)
+      (cond ((eq? m 'how-many-call?) (how-many-call?))
+            ((eq? m 'reset-count) (reset-count))
+            (else (begin (set! cnt (+ cnt 1))
+                         (f m)))))
+    dispatch))
+#+END_SRC
+
+* Exercise3.3
+可以创建带密码保护的账户的过程 =make-account= 定义如下:
+#+BEGIN_SRC scheme
+(define (make-account balance password)
+  (define (withdraw amount)
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficiant funds"))
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+  (define (incorrect m)
+    "Incorrect password")
+  (define (dispatch passwd m)
+    (if (eq? password passwd)
+        (cond ((eq? m 'withdraw) withdraw)
+              ((eq? m 'deposit) deposit)
+              (else (error "Unknown request -- MAKE-ACCOUNT"
+                           m)))
+        incorrect))
+  dispatch)
+#+END_SRC
+
+* Exercise3.4
+修改Exercise3.3中的程序, 使得如果一个账户被用不正确的密码连续访问了7次, 就调用
+指定报警程序, 程序实现如下:
+#+BEGIN_SRC scheme
+(define (make-account balance password)
+  (define (withdraw amount)
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficiant funds"))
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+  (define (incorrect m)
+    "Incorrect password")
+  (define (call-the-cops m)
+    "Call the cops")
+  (let ((try-count 0))
+    (define (dispatch passwd m)
+      (if (eq? password passwd)
+          (begin (set! try-count 0)
+                 (cond ((eq? m 'withdraw) withdraw)
+                       ((eq? m 'deposit) deposit)
+                       (else (error "Unknown request -- MAKE-ACCOUNT"
+                                    m))))
+          (begin (set! try-count (+ 1 try-count))
+                 (if (= try-count 7)
+                     call-the-cops
+                     incorrect))))
+    dispatch))
+#+END_SRC
+
+* Exercise3.5
+利用蒙特卡罗积分思想实现过程 =estimate-integral= 的定义如下:
+#+NAME: estimate-integral.scm
+#+BEGIN_SRC scheme
+(define (estimate-integral P x1 x2 y1 y2 times)
+  ;; Experiemtn method
+  (define (experiment)
+    (P (random-in-range x1 x2) (random-in-range y1 y2)))
+  ;; Random generator
+  (define (random-in-range low high)
+    (let ((range (- high low)))
+      (+ low (random range))))
+  ;; Mento-carlo method
+  (define (mento-carlo trials experiment)
+    (define (iter trials-remaining trials-passed)
+      (cond ((= trials-remaining 0)
+             (/ trials-passed trials))
+            ((experiment)
+             (iter (- trials-remaining 1) (+ trials-passed 1)))
+            (else
+             (iter (- trials-remaining 1) trials-passed))))
+    (iter trials 0))
+  ;; return
+  (* (- x2 x1) (- y2 y1) (mento-carlo times experiment)))
+#+END_SRC
+
+* Exercise3.6
+可以重置的随机数过程实现如下:
+#+BEGIN_SRC scheme
+(define (rand)
+  (let ((x random-init))
+    (define (generate)
+      (begin (set! x (rand-update x))
+             x))
+    (define (reset init)
+      (begin (set! x init)
+             x))
+    (define (dispatch m)
+      (cond ((eq? m 'generate) generate)
+            ((eq? m 'reset) reset)
+            (else (error "Unknow request -- RAND"
+                         m))))
+    dispatch))
+#+END_SRC
+
+* Exercise3.7
+实现创建公用账户功能的过程 =make-joint= 定义如下:
+#+NAME: make-joint.scm
+#+BEGIN_SRC scheme
+(define (make-joint account passwd new-passwd)
+  ((account passwd 'add-passwd) new-passwd))
+
+(define (make-account balance passwd)
+  (define (withdraw amount)
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Insufficiant funds"))
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+  (define (incorrect amount)
+    "Incorrent password")
+  (let ((passwds (list passwd)))
+    (define (auth passwd passwds)
+      (cond ((null? passwds) #f)
+            ((eq? passwd (car passwds)) #t)
+            (else (auth passwd (cdr passwds)))))
+    (define (dispatch passwd m)
+      (cond ((not (auth passwd passwds))
+             incorrect)
+            ((eq? m 'withdraw) withdraw)
+            ((eq? m 'deposit) deposit)
+            ((eq? m 'add-passwd) add-passwd)
+            (else (error "Unkown request -- MAKE_ACCOUNT"
+                         m))))
+    (define (add-passwd new-passwd)
+      (begin (set! passwds (cons new-passwd passwds))
+             dispatch))
+    dispatch))
+#+END_SRC
+
+* Exercise3.8
+定义f的过程如下:
+#+BEGIN_SRC scheme
+(define (make-f)
+  (let ((s '()))
+    (lambda (n)
+      (if (null? s)
+          s
+          (begin (set! s n) s)))))
+
+(define f (make-f))
+#+END_SRC
+对于 =(+ (f 0) (f 1))=, 若采用从左到右的求值顺序时返回0, 采用从右到左的求值顺序
+时返回1.
