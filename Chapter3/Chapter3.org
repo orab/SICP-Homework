@@ -237,3 +237,29 @@
 * Exercise3.11
 每个acc中定义的过程都保存在不同的环境之中, 调用这些过程时分别以这些不同的环境为
 父环境进行执行, 每个父环境定义有不同的balance变量.
+
+* Exercise3.12
+如下图所示, 在定义z后 =(cdr x)= 的结果为 =(b)=, 而在定义w后 =(cdr x)= 的结果为
+=(b c d)=.
+
+[[./images/312.png]]
+
+* Exercise3.13
+进行 =make-cycle= 操作后的模型图如下所示:
+
+[[./images/313.png]]
+
+可以看到结果形成一个环状链表, 如果试着计算 =(last-pair z)= 会陷入无限循环之中.
+
+* Exercise3.14
+=mystery= 操作将一个链表反转.
+
+=v= 约束对应的模型如下图所示:
+
+[[./images/314a.png]]
+
+求值 =(define w (mystery v))= 后的模型如下图所示:
+
+[[./images/314b.png]]
+
+* Exercise3.15
