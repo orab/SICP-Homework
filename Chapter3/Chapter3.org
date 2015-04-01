@@ -263,3 +263,48 @@
 [[./images/314b.png]]
 
 * Exercise3.15
+模型如下图所示:
+
+[[./images/315.png]]
+
+* Exercise3.16
+这一过程并不正确, 因为可能存在共享的序对, 这样的序对会被重复计算. 如下图所示:
+
+[[./images/316.png]]
+
+上图中的4个表结构都只有3个序对, 但是用题中所给出的程序计算, x结构返回3, y结构返回4,
+z结构返回7, 而w会使程序陷入无限循环当中.
+
+* Exercise3.17
+=count-pairs= 过程的正确版本实现如下:
+#+Name: count-pair.scm
+#+BEGIN_SRC scheme
+  (define (count-pairs x)
+    (define (contains e list)
+      (if (null? list)
+          #f
+          (or (eq? e (car list))
+              (contains e (cdr list)))))
+    (let ((existed '()))
+      (define (count-pairs-iter x)
+        (if (not (pair? x))
+            0
+            (if (contains x existed)
+                0
+                (begin (set! existed (cons x existed))
+                       (+ (count-pairs-iter (car x))
+                          (count-pairs-iter (cdr x))
+                          1)))))
+      (count-pairs-iter x)))
+
+#+END_SRC
+
+* Exercise3.18
+判断一个表是否存在环的过程实现如下:
+#+Name: has-cycle?.scm
+#+BEGIN_SRC scheme
+
+#+END_SRC
+
+* Exercise3.19
+答案见Exercise3.18.

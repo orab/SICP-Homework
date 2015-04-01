@@ -322,6 +322,8 @@
 #+Name: Exercise1.23
 #+BEGIN_SRC scheme
   (define (search-for-primes beg end)
+
+    ;; Runtime function
     (define (runtime)
       (let ((t (gettimeofday)))
         (+ (* 1000000 (car t))
@@ -645,7 +647,8 @@
   scheme@(guile-user)> (fermat-test 6601)
   $9 = #t
 #+END_SRC
-* TOVERIFY Exercise1.28
+* VERIFIED Exercise1.28
+CLOSED: [2015-03-25 Wed 15:38]
 利用Miller-Rabin检查来判断素数的过程如下:
 #+Name: Exercise1.28
 #+BEGIN_SRC scheme
@@ -654,8 +657,10 @@
     (define (expmod-ex base exp m)
       (cond ((= exp 0) 1)
             ((even? exp)
-             (remainder (square (expmod-ex base (/ exp 2) m))
-                        m))
+             (if (= (remainder (square base) n) 1)
+                 0
+                 (remainder (square (expmod-ex base (/ exp 2) m))
+                            m)))
             (else
              (remainder (* base (expmod-ex base (- exp 1) m))
                         m))))
@@ -1041,8 +1046,26 @@ $3 = 21
     (lambda (x)
       (((repeater smooth n) f) x)))
 #+END_SRC
-* TODO Exercise1.45
-TODO
+* Exercise1.45
+需要做平均阻尼的次数为 \floor*{log_2(n))}. 具体过程实现如下:
+#+BEGIN_SRC scheme
+  (define (average a b)
+    (/ (+ a b) 2))
+  (define (power x n)
+    (if (= n 0)
+        1
+        (* x (power x (- n 1)))))
+  (define (log2 x)
+    (/ (log x) (log 2)))
+
+  (define (sqrt-n x n)
+    (define (average-damp-times)
+      (floor (log2 n)))
+    (fixed-point ((repeat average-damp (average-damp-times))
+                  (lambda (y)
+                    (/ x (power y (- n 1)))))
+                 1))
+#+END_SRC
 * Exercise1.46
 迭代式改进的一般化过程抽象定义如下:
 #+Name: iterative-improve.scm
