@@ -307,4 +307,4 @@ z结构返回7, 而w会使程序陷入无限循环当中.
 #+END_SRC
 
 * Exercise3.19
-答案见Exercise3.18.
+p答案见Exercise3.18.

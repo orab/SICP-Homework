@@ -2,13 +2,13 @@
 #+AUTHOR: Orab
 
 #+STARTUP: entitiespretty indent
-#+TODO: TODO TOVERIFY | VERIFIED
+#+OPTIONS: ^:{}
+#+TODO: TODO(t) TOVERIFY(v) | VERIFIED(d)
 
 * Exercise2.1
-对于一个分数而言, 只有当分子分母同时取负时值不变, 所以如果要保证分母始终为正值,
-只需要在分母为负时对分子分母同时取负即可.
+对于一个分数而言, 只有当分子分母同时取负时值不变, 所以如果要保证分母始终为正值,只需要在分母为负时对分子分母同时取负即可.
 
-=make-rat= 的更好版本定义如下:
+~make-rat~ 的更好版本定义如下:
 #+Name: make-rat.scm
 #+BEGIN_SRC scheme
   (define (make-rat numer denom)
@@ -67,11 +67,50 @@
 
 #+END_SRC
 
-* TODO Exercise2.3
-TODO: 平面矩形是否需要确定位置及旋转角度等信息, 如果需要该怎样实现?
+* Exercise2.3
+*假设所有矩形的边与x轴, y轴分别平行.*
+
+可以通过左上角和右下角的两个点来定义平面上的矩形:
+#+BEGIN_SRC scheme
+  (define (make-rect p-lefttop p-rightbottom)
+    (cons p-lefttop p-rightbottom))
+
+  (define (rect-width rect)
+    (- (point-x (cdr rect))
+       (point-x (car rect))))
+
+  (define (rect-height rect)
+    (- (point-y (car rect))
+       (point-y (cdr rect))))
+#+END_SRC
+使用该定义来计算矩形的周长和面积, 过程如下:
+#+BEGIN_SRC scheme
+  (define (rect-perimeter rect)
+    (* 2 (+ (rect-width rect)
+            (rect-height rect))))
+
+  (define (rect-area rect)
+    (* (rect-width rect)
+       (rect-height rect)))
+#+END_SRC
+另外一种表示矩形的方法可以使用左边的线段和下边的线段来定义:
+#+BEGIN_SRC scheme
+  (define (make-rect s-left s-bottom)
+    (cons s-left s-bottom))
+
+  (define (rect-width rect)
+    (- (point-x (end-segment (cdr rect)))
+       (point-x (start-segment (cdr rect)))))
+
+  (define (rect-height rect)
+    (- (point-y (start-segment (car rect)))
+       (point-y (end-segment (car rect)))))
+#+END_SRC
+由于矩形的面积由矩形的长和宽来决定, 所以只要抽象出 ~rect-width~ 和 ~rect-height~
+过程就可以使同一个周长或者面积过程在两种不同的表示下都能工作.
 
 * Exercise2.4
-利用代换模型, 将 =car= 过程依次展开的结果为:
+利用代换模型, 将 ~car~ 过程依次展开的结果为:
 #+Name: verify
 #+BEGIN_SRC scheme
   (car (cons x y))
@@ -82,7 +121,7 @@ TODO: 平面矩形是否需要确定位置及旋转角度等信息, 如果需要
 
 #+END_SRC
 
-对应的 =cdr= 的定义为:
+对应的 ~cdr~ 的定义为:
 #+Name: cdr.scm
 #+BEGIN_SRC scheme
   (define (cdr z)
@@ -90,8 +129,7 @@ TODO: 平面矩形是否需要确定位置及旋转角度等信息, 如果需要
 #+END_SRC
 
 * Exercise2.5
-由于2的幂和3的幂不存在大于1的公约数, 所以分别找出可以整除的2的最大次幂和可以整
-除的3的最大次幂的结果就可以确定a和b的值.
+由于2的幂和3的幂不存在大于1的公约数, 所以分别找出可以整除的2的最大次幂和可以整除的3的最大次幂的结果就可以确定a和b的值.
 
 过程定义如下:
 #+Name: cons-power.scm
@@ -115,7 +153,7 @@ TODO: 平面矩形是否需要确定位置及旋转角度等信息, 如果需要
 #+END_SRC
 
 * Exercise2.6
-通过代换Church计数的 =zero= 和 =add-1= 到 =(add-1 zero)= 中, 结果如下:
+通过代换Church计数的 ~zero~ 和 ~add-1~ 到 ~(add-1 zero)~ 中, 结果如下:
 #+Name: one.scm
 #+BEGIN_SRC scheme
   (add-1 zero)
@@ -124,9 +162,9 @@ TODO: 平面矩形是否需要确定位置及旋转角度等信息, 如果需要
   (lambda (f) (lambda (x) (f ((lambda (x) x) x))))
   (lambda (f) (lambda (x) (f x)))
 #+END_SRC
-即 =one= 的定义式为 =(lambda (f) (lambda (x) (f x)))=.
+即 ~one~ 的定义式为 ~(lambda (f) (lambda (x) (f x)))~.
 
-再将 =one= 和 =add-1= 代入到 =(add-1 one)= 中, 结果如下:
+再将 ~one~ 和 ~add-1~ 代入到 ~(add-1 one)~ 中, 结果如下:
 #+Name: two.scm
 #+BEGIN_SRC scheme
   (add-1 two)
@@ -135,11 +173,9 @@ TODO: 平面矩形是否需要确定位置及旋转角度等信息, 如果需要
   (lambda (f) (lambda (x) (f ((lambda (x) (f x)) x))))
   (lambda (f) (lambda (x) (f (f x))))
 #+END_SRC
-即 =two= 的定义式为 =(lambda (f) (lambda (x) (f (f x))))=.
+即 ~two~ 的定义式为 ~(lambda (f) (lambda (x) (f (f x))))~.
 
-经过上面的代换可以看出 =add-1= 的过程实际上相当于在原来的过程中增加了一个 =f=
-函数的迭代调用, 而加法的定义可以看做是 =add-n= 的过程, 即要在原来的过程中增加n
-个 =f= 函数的迭代调用, 等于用Church计数时数n中 =f= 函数迭代调用的次数.
+经过上面的代换可以看出 ~add-1~ 的过程实际上相当于在原来的过程中增加了一个 ~f~ 函数的迭代调用, 而加法的定义可以看做是 ~add-n~ 的过程, 即要在原来的过程中增加 n 个 ~f~ 函数的迭代调用, 等于用 Church 计数时数n中 ~f~ 函数迭代调用的次数.
 
 因此加法过程的一个直接定义为:
 #+Name: add.scm
@@ -165,8 +201,7 @@ TODO: 平面矩形是否需要确定位置及旋转角度等信息, 如果需要
 #+END_SRC
 
 * Exercise2.8
-对于两个区间的减法来说, 最大值为减数的上界减去被减数的下界, 最小值为减数的下界
-减去被减数的上界. 具体定义如下:
+对于两个区间的减法来说, 最大值为减数的上界减去被减数的下界, 最小值为减数的下界减去被减数的上界. 具体定义如下:
 #+Name sub-interval.scm
 #+BEGIN_SRC scheme
   (define (sub-interval x y)
@@ -177,18 +212,12 @@ TODO: 平面矩形是否需要确定位置及旋转角度等信息, 如果需要
 * Exercise2.9
 我们可以通过一般化的推导来证明题中的结论:
 
-假设两个区间分别为 =(a1, b1)=, =(a2, b2)=, 则它们的和为 =(a1 + a2, b1 + b2)=,两
-个区间的宽度分别为 =b1 - a1=, =b2 - a2=, 而它们和的宽度为 =(b1 + b2) - (a1 +
-a2) = (b1 - a1) + (b2 - a2)=, 即两个区间的和的宽度等于两个区间宽度的和. 减法的过
-程同样如此, 上述两个区间的差为 =(a1 - b2, b1 - a2)=, 它们差的宽度为 =(b1 -
-a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两个区间宽度的差.
+假设两个区间分别为 ~(a1, b1)~, ~(a2, b2)~, 则它们的和为 ~(a1 + a2, b1 + b2)~, 两个区间的宽度分别为 ~b1 - a1~, ~b2 - a2~, 而它们和的宽度为 ~(b1 + b2) - (a1 + a2) = (b1 - a1) + (b2 - a2)~, 即两个区间的和的宽度等于两个区间宽度的和. 减法的过程同样如此, 上述两个区间的差为 ~(a1 - b2, b1 - a2)~, 它们差的宽度为 ~(b1 - a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)~, 两个区间的差的宽度等于两个区间宽度的差.
 
-对于乘和除而言并不满足这样的关系, 例如区间 =(1, 4)= 和 =(3, 9)= 的区间宽度分别
-为 =3= 和 =6=, 它们的乘积为 =(3, 36)=, 乘积宽度为 =33=, 而宽度的乘积为 =18=; 它
-们的商为 =(1/9, 4/3)=, 商宽度为 =10/9=, 而宽度的商为 =1/2=.
+对于乘和除而言并不满足这样的关系, 例如区间 ~(1, 4)~ 和 ~(3, 9)~ 的区间宽度分别为 ~3~ 和 ~6~, 它们的乘积为 ~(3, 36)~, 乘积宽度为 ~33~, 而宽度的乘积为 ~18~; 它们的商为 ~(1/9, 4/3)~, 商宽度为 ~10/9~, 而宽度的商为 ~1/2~.
 
 * Exercise2.10
-修正 =div-interval= 的过程为:
+修正 ~div-interval~ 的过程为:
 #+Name: div-interval.scm
 #+BEGIN_SRC scheme
   (define (div-interval x y)
@@ -199,14 +228,42 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
                                      (/ 1.0 (lower-bound y))))))
 #+END_SRC
 
-* TODO Exercise2.11
-重写 =mul-interval= 的过程如下:
-#+Name: mul-interval.scm
+* TOVERIFY Exercise2.11
+TOVERIFY: 在 ~(-, +)*(-, +)~ 的过程中用了4次乘法, 怎样才能在只用2次的情况下得出答案?
+
+重写 ~mul-interval~ 的过程如下:
 #+BEGIN_SRC scheme
+  (define (mul-interval x y)
+    (let ((xl (lower-bound x))
+          (xu (upper-bound x))
+          (yl (lower-bound y))
+          (yu (upper-bound y)))
+      (cond ((< xu 0)
+             (cond ((< yu 0)              ;1. (-, -) * (-, -)
+                    (make-interval (* xu yu) (* xl yl)))
+                   ((< yl 0)              ;2. (-, -) * (-, +)
+                    (make-interval (* xl yu) (* xl yl)))
+                   (else                  ;3. (-, -) * (+, +)
+                    (make-interval (* xl yu) (* xu yl)))))
+            ((< xl 0)
+             (cond ((< yu 0)              ;4. (-, +) * (-, -)
+                    (make-interval (* xu yl) (* xl yl)))
+                   ((< yl 0)              ;5. (-, +) * (-, +)
+                    (make-interval (min (* xl yu) (* xu yl))
+                                   (max (* xl yl) (* xu yu))))
+                   (else                  ;6. (-, +) * (+, +)
+                    (make-interval (* xl yu) (* xu yu)))))
+            (else
+             (cond ((< yu 0)              ;7. (+, +) * (-, -)
+                    (make-interval (* xu yl) (* xl yu)))
+                   ((< yl 0)              ;8. (+, +) * (-, +)
+                    (make-interval (* xu yl) (* xu yu)))
+                   (else                  ;9. (+, +) * (+, +)
+                    (make-interval (* xl yl) (* xu yu)))))))
 #+END_SRC
 
 * Exercise2.12
-=make-center-percent= 的过程定义如下:
+~make-center-percent~ 的过程定义如下:
 #+Name: center-percent.scm
 #+BEGIN_SRC scheme
   (define (make-center-percent c p)
@@ -220,12 +277,12 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
 #+END_SRC
 
 * Exercise2.13
-设两个区间分别为 =(x - ax, x + ax)=, =(y - by, y + by)=, 它们的乘积宽度为
-=(xy + axy + bxy + abxy) - (xy - axy - bxy + abxy) = 2(a + b)xy=, 当百分比很小时,
-乘积本身可看做 =(xy - (a + b)xy, xy + (a + b)xy)=, 所以两个被乘区间的百分误差可
+设两个区间分别为 ~(x - ax, x + ax)~, ~(y - by, y + by)~, 它们的乘积宽度为
+~(xy + axy + bxy + abxy) - (xy - axy - bxy + abxy) = 2(a + b)xy~, 当百分比很小时,
+乘积本身可看做 ~(xy - (a + b)xy, xy + (a + b)xy)~, 所以两个被乘区间的百分误差可
 看做各自百分误差之和.
 
-* TOVERIFY Exercise2.14
+* Exercise2.14
 1. 通过程序验证, 得到的输出如下:
    #+Name: Output
    #+BEGIN_SRC
@@ -237,7 +294,7 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
      $2 = (1.2000000000000002 . 2.6666666666666665)
 
    #+END_SRC
-   可以看到两种方式所得到的结果完全不同.
+   可以看到两种方式所得到的结果完全不同. ~par2~ 过程得到的结果区间要更小一点.
 
 2. 按照中心-百分比形式进行除法检验的输出为:
    #+Name: Output
@@ -254,8 +311,8 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
      scheme@(guile-user)> (center r1)
      $3 = 1.000200020002
      scheme@(guile-user)> (percent r1)
-     $4 = 0.019998000199980024scheme
-     @(guile-user)> (define r2 (div-interval A B))
+     $4 = 0.019998000199980024
+     scheme@(guile-user)> (define r2 (div-interval A B))
      scheme@(guile-user)> (center r2)
      $5 = 2.001200480192077
      scheme@(guile-user)> (percent r2)
@@ -265,10 +322,16 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
    可以看出两个相同区间作除法并没有得到理论上的标准单位元. 商的误差百分比大致相
    当于被除数和除数的误差百分比之和, 即所做运算使误差区间增大.
 
-* TODO Exercise2.15
+* Exercise2.15
+在 ~par1~ 过程中, 在进行除法计算时除数和被除数之间存在相关关系, 但是在计算时依然
+是按照无关变量的方式进行计算, 因此范围被"虚拟"地扩大了. 而在 ~par2~ 不存在这样的
+情况. 因此 ~par2~ 是比 ~par1~ "更好的" 程序.
+
 * TODO Exercise2.16
+TODO: 要想使得等价的代数表达式得到的结果相同, 需要考虑相关变量在分步计算中所带来的影响.
+
 * Exercise2.17
-过程 =last-pair= 的定义如下:
+过程 ~last-pair~ 的定义如下:
 #+Name: last-pair.scm
 #+BEGIN_SRC scheme
   (define (last-pair list)
@@ -278,7 +341,7 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
 #+END_SRC
 
 * Exercise2.18
-过程 =reverse= 的定义如下:
+过程 ~reverse~ 的定义如下:
 #+Name reverse.scm
 #+BEGIN_SRC scheme
   (define (reverse list)
@@ -314,12 +377,12 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
   (define (first-denomination coin-values)
     (car coin-values))
 #+END_SRC
-表 =coin-values= 的排列顺序不会影响cc给出的答案, 因为
-=except-first-denomination= 和 =first-denomination= 的过程包含了所有可能的情况,
+表 ~coin-values~ 的排列顺序不会影响cc给出的答案, 因为
+~except-first-denomination~ 和 ~first-denomination~ 的过程包含了所有可能的情况,
 即任何一种可能的情况要么出现在第一种情况中, 要么出现在第二种情况中, 而与顺序无关.
 
 * Exercise2.20
-过程 =same-parity= 的定义如下:
+过程 ~same-parity~ 的定义如下:
 #+Name: same-parity.scm
 #+BEGIN_SRC scheme
   (define (same-parity x . list)
@@ -335,7 +398,7 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
 #+END_SRC
 
 * Exercise2.21
-过程 =square-list= 的两个定义的补全如下:
+过程 ~square-list~ 的两个定义的补全如下:
 #+Name: square-list.scm
 #+BEGIN_SRC scheme
   (define (square-list items)
@@ -350,13 +413,11 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
 #+END_SRC
 
 * Exercise2.22
-1. 按第一种方式产生出的结果中, 因为items中先被取出(car)的元素会先被加入结果的表
-   中, 这样原表中的元素在新表中会在与之对称的位置, 即元素的顺序正好相反.
-2. 按照第二种方式, 说得结果中每个cons的第二个元素都指向一个实际值, 与表定义所要
-   求的正好相反.
+1. 按第一种方式产生出的结果中, 因为items中先被取出(car)的元素会先被加入结果的表中, 这样原表中的元素在新表中会在与之对称的位置, 即元素的顺序正好相反.
+2. 按照第二种方式, 说得结果中每个cons的第二个元素都指向一个实际值, 与表定义所要求的正好相反.
 
 * Exercise2.23
-过程 =for-each= 的一个实现如下:
+过程 ~for-each~ 的一个实现如下:
 #+Name: for-each.scm
 #+BEGIN_SRC scheme
   (define (for-each f items)
@@ -366,12 +427,12 @@ a2) - (a1 - b2) = (b1 - a1) - (b2 - a2)=, 两个区间的差的宽度等于两�
            (for-each f (cdr items)))))
 #+END_SRC
 
-* TODO Exercise2.24
-解释器打印的结果为 =(1 (2 (3 4)))=.
-TODO: 图形化显示对应的盒状指针结构.
+* Exercise2.24
+解释器打印的结果为 ~(1 (2 (3 4)))~.
+[[./images/224.png]]
 
 * Exercise2.25
-从下面各表中取出7的 =car= 和 =cdr= 的组合为:
+从下面各表中取出7的 ~car~ 和 ~cdr~ 的组合为:
 #+Name: Solutions
 #+BEGIN_SRC scheme
   ;; (1 3 (5 7) 9)
@@ -404,7 +465,7 @@ TODO: 图形化显示对应的盒状指针结构.
 #+END_SRC
 
 * Exercise2.27
-过程 =deep-reverse= 的定义如下:
+过程 ~deep-reverse~ 的定义如下:
 #+Name: deep-reverse.scm
 #+BEGIN_SRC scheme
   (define (deep-reverse tree)
@@ -416,7 +477,7 @@ TODO: 图形化显示对应的盒状指针结构.
 #+END_SRC
 
 * Exercise2.28
-过程 =fringe= 的定义如下:
+过程 ~fringe~ 的定义如下:
 #+Name: fringe.scm
 #+BEGIN_SRC scheme
   (define (fringe tree)
@@ -428,7 +489,7 @@ TODO: 图形化显示对应的盒状指针结构.
 #+END_SRC
 
 * Exercise2.29
-1. =branch= 的一些简单操作定义如下:
+1. ~branch~ 的一些简单操作定义如下:
    #+Name: branch.scm
    #+BEGIN_SRC scheme
      (define (make-mobile left right)
@@ -449,7 +510,7 @@ TODO: 图形化显示对应的盒状指针结构.
      (define (branch-structure branch)
        (car (cdr branch)))
    #+END_SRC
-2. 过程 =total-weight= 的定义如下:
+2. 过程 ~total-weight~ 的定义如下:
    #+Name: total-weight.scm
    #+BEGIN_SRC scheme
      (define (total-weight mobile)
@@ -461,7 +522,7 @@ TODO: 图形化显示对应的盒状指针结构.
                  (total-weight
                   (branch-structure (right-branch mobile)))))))
    #+END_SRC
-3. 检查一个二叉活动体是否平衡的过程 =balance?= 的定义如下:
+3. 检查一个二叉活动体是否平衡的过程 ~balance?~ 的定义如下:
    #+Name: balance?.scm
    #+BEGIN_SRC scheme
      (define (balance? mobile)
@@ -499,7 +560,7 @@ TODO: 图形化显示对应的盒状指针结构.
    #+END_SRC
 
 * Exercise2.30
-使用递归定义 =square-tree= 的过程如下:
+使用递归定义 ~square-tree~ 的过程如下:
 #+Name: square-tree.scm
 #+BEGIN_SRC scheme
   (define (square-tree tree)
@@ -508,7 +569,7 @@ TODO: 图形化显示对应的盒状指针结构.
           (else (cons (square-tree (car tree))
                       (square-tree (cdr tree))))))
 #+END_SRC
-使用 =map= 定义 =square-tree= 的过程如下:
+使用 ~map~ 定义 ~square-tree~ 的过程如下:
 #+Name: square-tree.scm
 #+BEGIN_SRC scheme
   (define (square-tree tree)
@@ -520,7 +581,7 @@ TODO: 图形化显示对应的盒状指针结构.
 #+END_SRC
 
 * Exercise2.31
-利用 =map= 做进一步的抽象过程 =tree-map=, 过程定义如下:
+利用 ~map~ 做进一步的抽象过程 ~tree-map~, 过程定义如下:
 #+Name: tree-map.scm
 #+BEGIN_SRC scheme
   (define (tree-map func tree)
@@ -532,7 +593,7 @@ TODO: 图形化显示对应的盒状指针结构.
 #+END_SRC
 
 * Exercise2.32
-过程 =subsets= 的完整定义如下:
+过程 ~subsets~ 的完整定义如下:
 #+Name: subsets.scm
 #+BEGIN_SRC scheme
   (define (subsets s)
@@ -572,7 +633,7 @@ TODO: 图形化显示对应的盒状指针结构.
 #+END_SRC
 
 * Exercise2.35
-用累积的形式重新定义 =count-leaves= 的过程如下:
+用累积的形式重新定义 ~count-leaves~ 的过程如下:
 #+Name: count-leaves.scm
 #+BEGIN_SRC scheme
   (define (count-leaves t)
@@ -581,7 +642,7 @@ TODO: 图形化显示对应的盒状指针结构.
 #+END_SRC
 
 * Exercise2.36
-完整的 =accumulate-n= 定义如下:
+完整的 ~accumulate-n~ 定义如下:
 #+Name: accumulate-n.scm
 #+BEGIN_SRC scheme
   (define (accumulate-n op init seqs)
@@ -627,7 +688,7 @@ TODO: 图形化显示对应的盒状指针结构.
 #+END_SRC
 
 * Exercise2.39
-分别基于 =fold-right= 和 =fold-left= 定义 =reverse= 的过程如下:
+分别基于 ~fold-right~ 和 ~fold-left~ 定义 ~reverse~ 的过程如下:
 #+Name: reverse.scm
 #+BEGIN_SRC scheme
   (define (reverse sequence)
@@ -638,7 +699,7 @@ TODO: 图形化显示对应的盒状指针结构.
 #+END_SRC
 
 * Exercise2.40
-过程 =unique-pairs= 的定义如下:
+过程 ~unique-pairs~ 的定义如下:
 #+Name: unique-pairs.scm
 #+BEGIN_SRC scheme
   (define (unique-pairs n)
@@ -652,7 +713,7 @@ TODO: 图形化显示对应的盒状指针结构.
           ((= beg end) (list end))
           (else (cons beg (enumerate-interval (+ beg 1) end)))))
 #+END_SRC
-用 =unique-pairs= 简化 =prime-sum-pairs= 的定义如下:
+用 ~unique-pairs~ 简化 ~prime-sum-pairs~ 的定义如下:
 #+Name: prime-sum-pairs.scm
 #+BEGIN_SRC scheme
   (define (prime-sum-pairs n)
@@ -667,7 +728,7 @@ TODO: 图形化显示对应的盒状指针结构.
 #+END_SRC
 
 * Exercise2.41
-过程 =fixed-sum-tuples= 的定义如下:
+过程 ~fixed-sum-tuples~ 的定义如下:
 #+Name: fixed-sum-tuples.scm
 #+BEGIN_SRC scheme
   (define (fixed-sum-tuples n s)
@@ -718,14 +779,14 @@ TODO: 图形化显示对应的盒状指针结构.
 #+END_SRC
 
 * Exercise2.43
-假设执行一次 =adjoin-position= 的时间为单位时间, 当我们采用Exercise2.42中的过程
-时, 有 =T(n) = T(n - 1) + a(n - 1) * k=, 其中 =T(n)= 表示 =k = n= 的运行时间,
-=a(n)= 表示 =(queen-cols n)= 的长度. 当交换嵌套映射的顺序后, 运行时间 =T'(n) =
-s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去解决八皇后问题
-时, 时间消耗大致为 =8^8 * T=.
+假设执行一次 ~adjoin-position~ 的时间为单位时间, 当我们采用Exercise2.42中的过程
+时, 有 ~T(n) = T(n - 1) + a(n - 1) * k~, 其中 ~T(n)~ 表示 ~k = n~ 的运行时间,
+~a(n)~ 表示 ~(queen-cols n)~ 的长度. 当交换嵌套映射的顺序后, 运行时间 ~T'(n) ~
+s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去解决八皇后问题
+时, 时间消耗大致为 ~8^8 * T~.
 
-* Exercise2.44
-过程 =up-split= 定义如下:
+* Exercise2.44`
+过程 ~up-split~ 定义如下:
 #+Name: up-split.scm
 #+BEGIN_SRC scheme
   (define (up-split painter n)
@@ -736,7 +797,7 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
 #+END_SRC
 
 * Exercise2.45
-过程 =split= 的定义如下:
+过程 ~split~ 的定义如下:
 #+Name: split.scm
 #+BEGIN_SRC scheme
   (define (split p1 p2)
@@ -748,7 +809,7 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
 #+END_SRC
 
 * Exercise2.46
-关于 =vect= 的一系列过程定义如下:
+关于 ~vect~ 的一系列过程定义如下:
 #+Name: vect.scm
 #+BEGIN_SRC scheme
   (define (make-vect x y)
@@ -774,7 +835,7 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
 #+END_SRC
 
 * Exercise2.47
-为第一种 =make-frame= 实现选择函数为:
+为第一种 ~make-frame~ 实现选择函数为:
 #+Name: make-frame.scm
 #+BEGIN_SRC scheme
   (define (make-frame origin edge1 edge2)
@@ -790,7 +851,7 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
     (caddr frame))
 #+END_SRC
 
-第二种 =make-frame= 的选择函数实现为:
+第二种 ~make-frame~ 的选择函数实现为:
 #+Name: make-frame.scm
 #+BEGIN_SRC scheme
   (define (make-frame origin edge1 edge2)
@@ -807,7 +868,7 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
 #+END_SRC
 
 * Exercise2.48
-基于 =vect= 定义 =segment= 的相关过程如下:
+基于 ~vect~ 定义 ~segment~ 的相关过程如下:
 #+Name: segment.scm
 #+BEGIN_SRC scheme
   (define (make-segment v1 v2)
@@ -820,8 +881,8 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
     (cdr s))
 #+END_SRC
 
-* TODO Exercise2.49
-利用 =segments->painter= 分别定义如下的基本画家:
+* Exercise2.49
+利用 ~segments->painter~ 分别定义如下的基本画家:
 #+Name: painter.scm
 #+BEGIN_SRC scheme
   ;; a) border-painter
@@ -847,11 +908,30 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
            (make-segment (make-vect 0 0.5) (make-vect 0.5 0)))))
 
   ;; d) wave
-  (define wave (segments->painter wave-segments))
+  (define wave
+    (segments->painter
+     (list (make-segment (make-vect 0.4 0.0) (make-vect 0.5 0.33))
+           (make-segment (make-vect 0.5 0.33) (make-vect 0.6 0.0))
+           (make-segment (make-vect 0.75 0.0) (make-vect 0.6 0.45))
+           (make-segment (make-vect 0.6 0.45) (make-vect 0.99 0.2))
+           (make-segment (make-vect 0.99 0.4) (make-vect 0.8 0.65))
+           (make-segment (make-vect 0.8 0.65) (make-vect 0.6 0.65))
+           (make-segment (make-vect 0.6 0.65) (make-vect 0.65 0.8))
+           (make-segment (make-vect 0.65 0.8) (make-vect 0.6 0.99))
+           (make-segment (make-vect 0.4 0.99) (make-vect 0.35 0.8))
+           (make-segment (make-vect 0.35 0.8) (make-vect 0.4 0.65))
+           (make-segment (make-vect 0.4 0.65) (make-vect 0.33 0.65))
+           (make-segment (make-vect 0.33 0.65) (make-vect 0.1 0.6))
+           (make-segment (make-vect 0.1 0.6) (make-vect 0.0 0.8))
+           (make-segment (make-vect 0.0 0.6) (make-vect 0.1 0.4))
+           (make-segment (make-vect 0.1 0.4) (make-vect 0.3 0.6))
+           (make-segment (make-vect 0.3 0.6) (make-vect 0.33 0.5))
+           (make-segment (make-vect 0.33 0.5) (make-vect 0.25 0.0)))))
+
 #+END_SRC
 
 * Exercise2.50
-过程 =flip-horiz= 的定义如下:
+过程 ~flip-horiz~ 的定义如下:
 #+Name: flip-horiz.scm
 #+BEGIN_SRC scheme
   (define (flip-horiz painter)
@@ -875,8 +955,8 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
                        (make-vect 1.0 1.0)))
 #+END_SRC
 
-* TODO Exercise2.51
-通过两种不同方式定义 =below= 的过程如下:
+* Exercise2.51
+通过两种不同方式定义 ~below~ 的过程如下:
 #+Name: below.scm
 #+BEGIN_SRC scheme
   ;; 1
@@ -896,11 +976,13 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
           (paint-up frame)
           (paint-down frame)))))
 
-  ;; 2 TODO
+  ;; 2
+  (define (below painter1 painter2)
+    (rotate90 (beside (rotate270 painter1)
+                      (rotate270 painter2))))
 #+END_SRC
 
 * TODO Exercise2.52
-
 * Exercise2.53
 下列各个表达式的值分别为:
 #+Name: Solutions
@@ -928,7 +1010,7 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
 #+END_SRC
 
 * Exercise2.54
-过程 =equal?= 的定义如下:
+过程 ~equal?~ 的定义如下:
 #+Name: equal?.scm
 #+BEGIN_SRC scheme
   (define (equal? x y)
@@ -941,8 +1023,8 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
 #+END_SRC
 
 * Exercise2.55
-表达式 =(car ''abracadabra)= 等价于 =(car (quote (quote abracadabra)))=, 即对列
-表 =(quote abracadabra)= 做 =car= 操作, 因此返回结果为 =quote=.
+表达式 ~(car ''abracadabra)~ 等价于 ~(car (quote (quote abracadabra)))~, 即对列
+表 ~(quote abracadabra)~ 做 ~car~ 操作, 因此返回结果为 ~quote~.
 
 * Exercise2.56
 添加幂函数后的求导过程定义如下:
@@ -1009,7 +1091,7 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
         (cons '* (cddr p))))
 #+END_SRC
 
-* TODO Exercise2.58
+* Exercise2.58
 1. 采用中缀表达式定义谓词, 选择函数和构造函数的过程定义如下:
    #+Name: infix-deriv.scm
    #+BEGIN_SRC scheme
@@ -1037,10 +1119,57 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
      (define (multiplier p) (car p))
      (define (multiplicand p) (caddr p))
    #+END_SRC
-2. TODO 标准代数写法(中缀)的表示
+2. 采用标准代数写法(中缀)的表示, 选择函数和构造函数的过程定义如下：
+   #+NAME: infix-deriv-std.scm
+   #+BEGIN_SRC scheme
+     (define (make-sum a1 a2)
+       (cond ((=number? a1 0) a2)
+             ((=number? a2 0) a1)
+             ((and (number? a1) (number? a2)) (+ a1 a2))
+             (else (list a1 '+ a2))))
+
+     (define (make-product m1 m2)
+       (cond ((or (=number? m1 0) (=number? m2 0)) 0)
+             ((=number? m1 1) m2)
+             ((=number? m2 1) m1)
+             ((and (number? m1) (number? m2)) (* m1 m2))
+             (else (list m1 '* m2))))
+
+     (define (pare exp)
+       (if (and (pair? exp) (null? (cdr exp)))
+           (pare (car exp))
+           exp))
+     (define (sep-as-symbol exp s)
+       (define (sep-iter l-exp r-exp s)
+         (cond ((null? r-exp) '())
+               ((eq? s (car r-exp))
+                (cons (pare l-exp) (pare (cdr r-exp))))
+               (else (sep-iter (append l-exp (list (car r-exp)))
+                               (cdr r-exp)
+                               s))))
+       (sep-iter '() exp s))
+
+     (define (sum? exp)
+       (and (pair? exp)
+            (not (null? (sep-as-symbol exp '+)))))
+     (define (addend exp)
+       (car (sep-as-symbol exp '+)))
+     (define (augend exp)
+       (cdr (sep-as-symbol exp '+)))
+
+     (define (product? exp)
+       (and (pair? exp)
+            (null? (sep-as-symbol exp '+))
+            (not (null? (sep-as-symbol exp '*)))))
+     (define (multiplier exp)
+       (car (sep-as-symbol exp '*)))
+     (define (multiplicand exp)
+       (cdr (sep-as-symbol exp '*)))
+
+   #+END_SRC
 
 * Exercise2.59
-采用未排序的集合实现 =union-set= 的定义如下:
+采用未排序的集合实现 ~union-set~ 的定义如下:
 #+Name: union-set.scm
 #+BEGIN_SRC scheme
   (define (union-set set1 set2)
@@ -1071,12 +1200,26 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
                  (intersection-set (cdr set1) set2)))
           (else (intersection-set (cdr set1) set2))))
 #+END_SRC
-其中 =element-of-set?= 和 =intersection-set= 操作依然需要遍历表, 由于允许元素重
-复, 表长度相应增大, 所以这两项操作效率变低, 而 =adjoin-set= 和 =union-set= 操作
+其中 ~element-of-set?~ 和 ~intersection-set~ 操作依然需要遍历表, 由于允许元素重
+复, 表长度相应增大, 所以这两项操作效率变低, 而 ~adjoin-set~ 和 ~union-set~ 操作
 仅需常数时间即可完成. 当具体应用中操作大多数为添加和并操作时更倾向于使用该种表示.
 
 * Exercise2.61
-=adjoin-set= 依然使用 =element-of-set?= 来实现, 由于 =element-of-set?= 平均所需步数为采用未排序时表示的一半, =adjoin-set= 也为一半.
+采用排序表示时 ~adjoin-set~ 的实现如下：
+#+NAME: adjoin-set.scm
+#+BEGIN_SRC scheme
+  (define (adjoin-set x set)
+    (define (adjoin-set-iter x l-set r-set)
+      (if (or (null? r-set)
+                 (< x (car r-set)))
+          (append l-set (cons x r-set))
+          (adjoin-set-iter x
+                           (append l-set (list (car r-set)))
+                           (cdr r-set))))
+    (adjoin-set-iter x '() set))
+#+END_SRC
+程序运行时只需找到比当前插入元素大的元素的位置。平均而言，我们可以期望需要检查表
+中的一半元素，所需的平均步骤大约是 n / 2.
 
 * Exercise2.62
 在集合的排序表示上的一个\Theta(n)的实现如下:
@@ -1098,14 +1241,14 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
                                (union-set set1 (cdr set2)))))))))
 #+END_SRC
 
-* TODO Exercise2.63
+* TOVERIFY Exercise2.63
 1. 这两个过程都产生树的中序遍历结果.
-2. 两个过程做了相同数量的 =cons= 操作, 具有同样量级的增长速度.
+2. 两个过程做了相同数量的 ~cons~ 操作, 具有同样量级的增长速度.
 
 * Exercise2.64
-1. =partial-tree= 在每次递归时将所有结点分为两半, 这样保证了对于生成树的任意一
+1. ~partial-tree~ 在每次递归时将所有结点分为两半, 这样保证了对于生成树的任意一
    个结点, 其左子树与右子树结点数差不超过1, 因此该生成树是平衡二叉树. 将
-   =paritial-tree= 用于表 =(1 3 5 7 9)= 产生的树为:
+   ~paritial-tree~ 用于表 ~(1 3 5 7 9)~ 产生的树为:
    #+Name: Output
    #+BEGIN_SRC scheme
      (5 (1 ()
@@ -1116,14 +1259,14 @@ s * T'(n - 1) + a(n - 1) * k=, 其中 =s= 代表棋盘的大小, 当用后者去
            (11 ()
                ())))
    #+END_SRC
-2. 由程序的递归关系可得 =T(n) = 2 * T(n / 2) + \Theta(1)=, 所以转换n个元素的表
+2. 由程序的递归关系可得 ~T(n) = 2 * T(n / 2) + \Theta(1)~, 所以转换n个元素的表
    所需的步数以 \Theta(n) 为量级.
 
 * TODO Exercise2.65
 TODO 实现基于平衡二叉树版本的交集和并集操作.
 
 * Exercise2.66
-对于采用二叉树实现的集合, 定义 =lookup= 过程如下:
+对于采用二叉树实现的集合, 定义 ~lookup~ 过程如下:
 #+Name: lookup.scm
 #+BEGIN_SRC scheme
   (define (lookup given-key set-of-records)
@@ -1148,7 +1291,7 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 
   (define sample-message '(0 1 1 0 0 1 0 1 0 1 1 1 0))
 #+END_SRC
-使用过程 =decode= 得到的编码结果为:
+使用过程 ~decode~ 得到的编码结果为:
 #+Name: Output
 #+BEGIN_SRC
   scheme@(guile-user)> (decode sample-message sample-tree)
@@ -1157,7 +1300,7 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 #+END_SRC
 
 * Exercise2.68
-过程 =encode= 的定义如下:
+过程 ~encode~ 的定义如下:
 #+Name: encode.scm
 #+BEGIN_SRC scheme
   (define (encode message tree)
@@ -1215,10 +1358,10 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 
 #+END_SRC
 这一编码一共使用了88个二进制位. 若采用定长编码, 每个符号需要3个二进制位, 完成这
-个歌曲最少需要 =36 * 4 = 144= 个二进制位.
+个歌曲最少需要 ~36 * 4 = 144~ 个二进制位.
 
 * Exercise2.71
-对于这样的编码, 出现最频繁的符号要用1个二进制位表示, 最不频繁的符号要用 =n - 1=
+对于这样的编码, 出现最频繁的符号要用1个二进制位表示, 最不频繁的符号要用 ~n - 1~
 个二进制位表示.
 
 * Exercise2.72
@@ -1227,7 +1370,7 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 
 * Exercise2.73
 1. 数据导向的求导程序根据表达式的操作类型的不同选择不同的求导过程. 由于数字和符
-   号并非一种操作, 所以无法将 =number?= 和 =same-variable?= 也加入数据导向分派中.
+   号并非一种操作, 所以无法将 ~number?~ 和 ~same-variable?~ 也加入数据导向分派中.
 2. 针对和式和积式的求导过程实现如下:
    #+Name: deriv1.scm
    #+BEGIN_SRC scheme
@@ -1251,20 +1394,20 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 * Exercise2.74
 通过为每个操作定义针对不同分支机构的特定版本, 然后将这些操作注册到一个统一的表
 中, 然后实现一个过程可以从该表中根据不同的分支机构选择恰当的实现来执行操作.
-1. =get-recode= 过程
+1. ~get-recode~ 过程
    #+Name: get-recode.scm
    #+BEGIN_SRC scheme
      (define (get-record file)
        ((get 'get-record (institute file)) file))
    #+END_SRC
    各个独立机构的文件应该提供其机构的唯一标识.
-2. =get-salary= 过程
+2. ~get-salary~ 过程
    #+Name: get-salary.scm
    #+BEGIN_SRC scheme
      (define (get-salary file employee)
        ((get 'get-salary (insitute file)) file employee))
    #+END_SRC
-3. =find-employee-record= 过程
+3. ~find-employee-record~ 过程
    #+Name: find-employee-record.scm
    #+BEGIN_SRC scheme
      (define (find-employee-record employee-name file-list)
@@ -1278,7 +1421,7 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
    相应与该机构的特定版本.
 
 * Exercise2.75
-使用消息传递的方式实现 =make-from-mag-ang= 过程如下:
+使用消息传递的方式实现 ~make-from-mag-ang~ 过程如下:
 #+Name: make-from-mag-ang.scm
 #+BEGIN_SRC scheme
   (define (make-from-mag-ang m a)
@@ -1306,7 +1449,7 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 加入新操作的系统.
 
 * Exercise2.77
-表达式 =(magnitude z)= 的求值过程展开如下:
+表达式 ~(magnitude z)~ 的求值过程展开如下:
 #+Name: Solutions
 #+BEGIN_SRC scheme
   (magnitude x)
@@ -1315,7 +1458,7 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
   (magnitude (contents x))
   ((get 'magnitude '(rectangular)) (contents (contents x)))
 #+END_SRC
-其中 =apply-generic= 被调用了两次, 由于两次参数的类型不同, 实际会调用不同的过程.
+其中 ~apply-generic~ 被调用了两次, 由于两次参数的类型不同, 实际会调用不同的过程.
 
 * Exercise2.78
 利用Scheme的内部类型系统来改进原过程:
@@ -1343,13 +1486,13 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 #+END_SRC
 
 * Exercise2.79
-添加如下过程定义到 =install-scheme-number-package= 中:
+添加如下过程定义到 ~install-scheme-number-package~ 中:
 #+Name: Solutions
 #+BEGIN_SRC scheme
   (put 'equ? '(scheme-number scheme-number)
        (lambda (x y) (= x y)))
 #+END_SRC
-添加如下过程定义到 =install-rational-package= 中:
+添加如下过程定义到 ~install-rational-package~ 中:
 #+Name: Solutions
 #+BEGIN_SRC scheme
   (define (equ?-rat x y)
@@ -1359,7 +1502,7 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
   (put 'equ? '(rational rational)
        (lambda (x y) (equ?-rat x y)))
 #+END_SRC
-添加如下过程定义到 =install-complex-package= 中:
+添加如下过程定义到 ~install-complex-package~ 中:
 #+Name: Solutions
 #+BEGIN_SRC scheme
   (define (equ?-complex z1 z2)
@@ -1371,13 +1514,13 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 #+END_SRC
 
 * Exercise2.80
-添加如下过程定义到 =install-scheme-number-package= 中:
+添加如下过程定义到 ~install-scheme-number-package~ 中:
 #+Name: Solutions
 #+BEGIN_SRC scheme
   (put '=zero? '(scheme-number)
        (lambda (x) (= x 0)))
 #+END_SRC
-添加如下过程定义到 =install-rational-package= 中:
+添加如下过程定义到 ~install-rational-package~ 中:
 #+Name: Solutions
 #+BEGIN_SRC scheme
   (define (=zero?-rat x)
@@ -1386,7 +1529,7 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
   (put '=zero? '(rational)
        (lambda (x) (=zero?-rat x)))
 #+END_SRC
-添加如下过程定义到 =install-complex-package= 中:
+添加如下过程定义到 ~install-complex-package~ 中:
 #+Name: Solutions
 #+BEGIN_SRC scheme
   (define (=zero?-complex z)
@@ -1403,7 +1546,7 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
    后参数类型并没有发生改变, 也就是说依然不可能存在相应的操作, 所以程序会无休止
    的重复这一过程.
 2. 如上所述, 当相同类型参数无法找到相应操作时, 该种强制并不能解决问题.
-3. 修改 =apply-generic= , 使得程序不会试着强制两个相同类型参数的实现如下:
+3. 修改 ~apply-generic~ , 使得程序不会试着强制两个相同类型参数的实现如下:
    #+Name: apply-generic.scm
    #+BEGIN_SRC scheme
      (define (apply-generic op . args)
@@ -1432,9 +1575,8 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
    #+END_SRC
 
 * TODO Exercise2.82
-
 * TOVERIFY Exercise2.83
-为每个类型添加 =raise= 操作的实现如下:
+为每个类型添加 ~raise~ 操作的实现如下:
 #+Name: raise.scm
 #+BEGIN_SRC scheme
   ;; in install-scheme-number-package:
@@ -1456,7 +1598,7 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 #+END_SRC
 
 * Exercise2.84
-利用 =raise= 操作修改 =apply-generic= 过程如下:
+利用 ~raise~ 操作修改 ~apply-generic~ 过程如下:
 #+Name: apply-generic.scm
 #+BEGIN_SRC scheme
   (define (apply-generic op . args)
@@ -1481,16 +1623,15 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 #+END_SRC
 
 * TODO Exercise2.85
-过程 =drop= 实现如下:
+过程 ~drop~ 实现如下:
 #+Name: drop.scm
 #+BEGIN_SRC scheme
 
 #+END_SRC
 
 * TODO Exercise2.86
-
 * Exercise2.87
-为多项式定义和安装 =zero?= 过程定义如下:
+为多项式定义和安装 ~zero?~ 过程定义如下:
 #+Name: =zero?.scm
 #+BEGIN_SRC scheme
   (define (=zero?-poly terms)
