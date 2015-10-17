@@ -1,6 +1,21 @@
-#+STARTUP: indent
+#+TITLE: SICP Chapter 2 Notes
+#+AUTHOR: Orab
 
+#+STARTUP: content entitiespretty latexpreview
+#+OPTIONS: ^:{} toc:nil
+
+* 数据抽象导引
 * 层次性数据和闭包性质
+* 符号数据
+** 引号
+** 符号求导
+** 集合的表示
+#+NAME: 集合的不同实现方式效率比较
+| Implementation   | element-of-set? | adjoin-set | intersection-set | union-set |
+|------------------+-----------------+------------+------------------+-----------|
+| 无序表           | \Theta(n)            | \Theta(n)       | \Theta(n^{2})            | \Theta(n^{2})     |
+| 无序表（可重复） | \Theta(N)            | \Theta(1)       | \Theta(N^{2})            | \Theta(N^{2})     |
+| 有序表           | \Theta(n)            | \Theta(n)       | \Theta(n)             | \Theta(n)      |
+| 二叉树           | \Theta(log(n))       | \Theta(log(n))  | \Theta(n)             | \Theta(n)      |
 
-** 层次性结构
-1. =cons= 构造表的方式实质上是用二叉树来表示多叉树的过程.
+** Huffman 编码树

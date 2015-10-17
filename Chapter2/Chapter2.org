@@ -1,7 +1,7 @@
 #+TITLE: SICP Solutions: Chapter2
 #+AUTHOR: Orab
 
-#+STARTUP: entitiespretty indent
+#+STARTUP: indent content entitiespretty latexpreview
 #+OPTIONS: ^:{}
 #+TODO: TODO(t) TOVERIFY(v) | VERIFIED(d)
 
@@ -1030,20 +1030,6 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
 添加幂函数后的求导过程定义如下:
 #+Name: exponentiation.scm
 #+BEGIN_SRC scheme
-  (define (make-exponentiation u n)
-    (cond ((=number? n 0) 1)
-          ((=number? n 1) u)
-          (else (list '** n u))))
-
-  (define (exponentiation? exp)
-    (and (pair? exp) (eq? (car exp) '**)))
-
-  (define (base exp)
-    (cadr exp))
-
-  (define (exponent exp)
-    (caddr exp))
-
   (define (deriv exp var)
     (cond ((number? exp) 0)
           ((variable? exp)
@@ -1060,35 +1046,39 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
           ((exponentiation? exp)
            (make-product
             (make-product (exponent exp)
-                          (make-exponentiation (base exp)
-                                               (- (exponent exp) 1)))
+                          (make-exponentiation (base exp) (- (exponent exp) 1)))
             (deriv (base exp) var)))
           (else
-           (error "unknown expression type -- DERIV" exp))))
-           #+END_SRC
+           (error "unkown expression type -- DERIV" exp))))
+
+  (define (exponentiation? x)
+    (and (pair? x) (eq? (car x) '^) (number? (caddr x))))
+  (define (make-exponentiation base exp)
+    (cond ((=number? exp 0) 1)
+          ((=number? exp 1) base)
+          ((and (number? base) (number? exp)) (expt base exp))
+          (else (list '^ base exp))))
+  (define (base e) (cadr e))
+  (define (exponent e) (caddr e))
+#+END_SRC
 
 * Exercise2.57
 经过改进的能处理任意项的和与乘积的求导程序定义如下:
 #+Name: deriv-ex.scm
 #+BEGIN_SRC scheme
-  (define (make-sum . slist)
-    (cons '+ slist))
-  (define (make-product . plist)
-    (cons '* plist))
-
   (define (addend s) (cadr s))
-
+  ;;(define (augend s) (caddr s))
   (define (augend s)
-    (if (= (length s) 3)
+    (if (null? (cdddr s))
         (caddr s)
         (cons '+ (cddr s))))
 
-  (define (multiplier p) (cadr p))
-
-  (define (multiplicand p)
-    (if (= (length p) 3)
-        (caddr p)
-        (cons '* (cddr p))))
+  (define (addend s) (cadr s))
+  ;;(define (augend s) (caddr s))
+  (define (augend s)
+    (if (null? (cdddr s))
+        (caddr s)
+        (cons '+ (cddr s))))
 #+END_SRC
 
 * Exercise2.58
@@ -1173,7 +1163,9 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
 #+Name: union-set.scm
 #+BEGIN_SRC scheme
   (define (union-set set1 set2)
-    (cond ((not (element-of-set? (car set1) set2))
+    (cond ((null? set1) set2)
+          ((null? set2) set1)
+          ((not (element-of-set? (car set1) set2))
            (cons (car set1) set2))
           (else (union-set (cdr set1) set2))))
 #+END_SRC
@@ -1211,7 +1203,7 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
   (define (adjoin-set x set)
     (define (adjoin-set-iter x l-set r-set)
       (if (or (null? r-set)
-                 (< x (car r-set)))
+              (< x (car r-set)))
           (append l-set (cons x r-set))
           (adjoin-set-iter x
                            (append l-set (list (car r-set)))
@@ -1241,7 +1233,7 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
                                (union-set set1 (cdr set2)))))))))
 #+END_SRC
 
-* TOVERIFY Exercise2.63
+* Exercise2.63
 1. 这两个过程都产生树的中序遍历结果.
 2. 两个过程做了相同数量的 ~cons~ 操作, 具有同样量级的增长速度.
 
@@ -1262,8 +1254,8 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
 2. 由程序的递归关系可得 ~T(n) = 2 * T(n / 2) + \Theta(1)~, 所以转换n个元素的表
    所需的步数以 \Theta(n) 为量级.
 
-* TODO Exercise2.65
-TODO 实现基于平衡二叉树版本的交集和并集操作.
+* Exercise2.65
+首先通过 ~tree->list~ 将两个集合由二叉树表示转换为有序表，然后利用之前有序表的过程做 ~union-set~ 和 ~intersection-set~ 操作，然后再通过 ~list->tree~ 将有序表转换为二叉树，这三个步骤每一步的时间复杂度都是 \Theta(n)，所以总的时间复杂度也为 \Theta(n)。
 
 * Exercise2.66
 对于采用二叉树实现的集合, 定义 ~lookup~ 过程如下:
@@ -1274,8 +1266,8 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
           ((= given-key (key (car set-of-records)))
            (car set-of-records))
           ((< given-key (key (car set-of-records)))
-           (lookup (left-branch set-of-records)))
-          (else (lookup (right-branch set-of-records)))))
+           (lookup given-key (left-branch set-of-records)))
+          (else (lookup given-key (right-branch set-of-records)))))
 #+END_SRC
 
 * Exercise2.67
@@ -1331,12 +1323,11 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
     (successive-merge (make-leaf-set pairs)))
 
   (define (successive-merge set)
-    (cond ((null? (cddr set))
-           (make-code-tree (car set) (cadr set)))
-          (else
-           (successive-merge
-            (adjoin-set (make-code-tree (car set) (cadr set))
-                        (cddr set))))))
+    (cond ((null? set) '())
+          ((null? (cdr set)) (car set))
+          (else (successive-merge
+                 (adjoin-set (make-code-tree (car set) (cadr set))
+                             (cddr set))))))
 #+END_SRC
 
 * Exercise2.70
@@ -1361,12 +1352,10 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
 个歌曲最少需要 ~36 * 4 = 144~ 个二进制位.
 
 * Exercise2.71
-对于这样的编码, 出现最频繁的符号要用1个二进制位表示, 最不频繁的符号要用 ~n - 1~
-个二进制位表示.
+对于这样的编码, 出现最频繁的符号要用 2 个二进制位表示, 最不频繁的符号要用 n 个二进制位表示.
 
 * Exercise2.72
-当符号的相对频率满足如2.71中所描述的规则时, 编码最频繁的符号所需的步数的增长速
-率为 \Theta(1), 最不频繁的符号所需步数的增长速率为 \Thead(n^2).
+当符号的相对频率满足如2.71中所描述的规则时, 编码最频繁的符号所需的步数的增长速率为 \Theta(1), 最不频繁的符号所需步数的增长速率为 \Theta(n^{2}).
 
 * Exercise2.73
 1. 数据导向的求导程序根据表达式的操作类型的不同选择不同的求导过程. 由于数字和符
@@ -1684,7 +1673,7 @@ TODO 实现基于平衡二叉树版本的交集和并集操作.
   (define (empty-termlist? term-list) (null? term-list))
 #+END_SRC
 
-* Exercise2.90
+* TODO Exercise2.90
 定义一个多项式系统, 使其同时允许两种表示形式, 实现如下:
 #+Name: polynomial.scm
 #+BEGIN_SRC scheme
