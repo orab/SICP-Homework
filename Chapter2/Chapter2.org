@@ -1358,8 +1358,7 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
 当符号的相对频率满足如2.71中所描述的规则时, 编码最频繁的符号所需的步数的增长速率为 \Theta(1), 最不频繁的符号所需步数的增长速率为 \Theta(n^{2}).
 
 * Exercise2.73
-1. 数据导向的求导程序根据表达式的操作类型的不同选择不同的求导过程. 由于数字和符
-   号并非一种操作, 所以无法将 ~number?~ 和 ~same-variable?~ 也加入数据导向分派中.
+1. 数据导向的求导程序根据表达式的操作类型的不同选择不同的求导过程. 由于对于是否是数字还是符号的判断是一个通用的过程，不需要根据不同的实现来进行选择，所以不应该将 ~number?~ 和 ~same-variable?~ 也加入数据导向分派中.
 2. 针对和式和积式的求导过程实现如下:
    #+Name: deriv1.scm
    #+BEGIN_SRC scheme
@@ -1372,12 +1371,12 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
           (make-product (multiplier exp)
                         (deriv (multiplicand exp) var))
           (make-product (deriv (multiplier exp) var)
-                        (multiplicand exp)))))
+                        (multiplicand exp))))
 
-     (put 'deriv-sum '(+) deriv-sum)
-     (put 'deriv-product '(*) deriv-product)
+       (put 'deriv-sum '(+) deriv-sum)
+       (put 'deriv-product '(*) deriv-product))
    #+END_SRC
-3. TODO 添加其他操作的求导程过
+3. [ ] 添加其他操作的求导过程
 4. 求导系统不是以求导实现方式分类, 而是按操作实现方式来分类.
 
 * Exercise2.74
@@ -1434,8 +1433,7 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
 3. 消息传递风格
    加入新类型不需要修改原有代码, 但加入新操作需要.
 
-消息传递风格最是个需要经常加入新类型的系统, 数据导向风格的组织方式最适合需要经常
-加入新操作的系统.
+消息传递风格最适合需要经常加入新类型的系统, 数据导向风格的组织方式最适合需要经常加入新操作的系统.
 
 * Exercise2.77
 表达式 ~(magnitude z)~ 的求值过程展开如下:
