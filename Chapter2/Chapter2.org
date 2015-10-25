@@ -2,7 +2,7 @@
 #+AUTHOR: Orab
 
 #+STARTUP: indent content entitiespretty latexpreview
-#+OPTIONS: ^:{}
+#+OPTIONS: ^:{} num:nil
 #+TODO: TODO(t) TOVERIFY(v) | VERIFIED(d)
 
 * Exercise2.1
@@ -56,7 +56,7 @@
 #+END_SRC
 验证输出结果为:
 #+Name: Output
-#+BEGIN_SRC shell
+#+BEGIN_SRC
   scheme@(guile-user)> (define x (make-point 2 9))
   scheme@(guile-user)> (define y (make-point 4 8))
   scheme@(guile-user)> (define seg (make-segment x y))
@@ -1561,8 +1561,11 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
                           (list op type-tags)))))))
    #+END_SRC
 
-* TODO Exercise2.82
-* TOVERIFY Exercise2.83
+* Exercise2.82
+在试着将多个参数都强制到其中一个的类型的策略中，如果这些参数拥有一个公共的超类型，但这个超类型并不属于参数中的任何一个的时候，这种策略就无法奏效。
+
+更为有效的策略的是建立不同类型的关系的图结构，根据参数类型的分布在关系图中找到所有参数的公共超类型，然后再做强制并执行操作。（需要在一个有向无环图中找到所有参数类型结点都可以到达的一个公共结点，该结点所代表的类型就是公共超类型。）
+* Exercise2.83
 为每个类型添加 ~raise~ 操作的实现如下:
 #+Name: raise.scm
 #+BEGIN_SRC scheme
@@ -1572,7 +1575,7 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
 
   ;; in install-rational-package:
   (define (raise-to-real rational)
-    rational)
+    (/ (numer rational) (demon rational)))
 
   ;; in install-real-package:
   (define (raise-to-complex real)
@@ -1603,29 +1606,54 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
                       (error "No method for these types"
                              (list op type-tags))
                       (if (higher-level type1 type2)
-                          (apply-generic op type1 (raise type2))
-                          (apply-generic op (raise type1) type2))))
+                          (apply-generic op a1 (raise a2))
+                          (apply-generic op (raise a1) a2))))
                 (error "No method for these types"
                        (list op type-tags)))))))
 #+END_SRC
 
-* TODO Exercise2.85
+* Exercise2.85
 过程 ~drop~ 实现如下:
 #+Name: drop.scm
 #+BEGIN_SRC scheme
+  ;; in install-rational-package:
+  (define (project-to-scheme-number rational)
+    (around (/ (numer rational) (demon rational))))
+
+  ;; in install-real-package:
+  (define (project-to-rational real)
+    (around real))
+
+  ;; in install-complex-package:
+  (define (project-to-real complex)
+    (real complex))
+
+  (put 'project '(rational) project-to-scheme-number)
+  (put 'project '(real) project-to-ratinal)
+  (put 'project '(complex) project-to-real)
+
+  (define (drop number)
+    (let ((project-value (apply-generic 'project number)))
+      (if (equ? number
+                (apply-generic 'raise project-value))
+          (drop project-value)
+          number)))
 
 #+END_SRC
+要使得 ~apply-generic~ 操作可以简化结果，在过程返回结果时调用 ~drop~ 即可。
 
-* TODO Exercise2.86
+* Exercise2.86
+为了使复数的实部、虚部、模和幅角都可以表示为常规数、有理数或者其它的类型，只需要修改现有系统中复数包的实现，将所有对于实部、虚部、模和幅角的操作都使用通用版本的操作即可。
+
 * Exercise2.87
 为多项式定义和安装 ~zero?~ 过程定义如下:
 #+Name: =zero?.scm
 #+BEGIN_SRC scheme
-  (define (=zero?-poly terms)
+  (define (=zero?-poly term-list)
     (if (empty-termlist? term?)
         #t
-        (and (=zero? (coeff (first-term terms)))
-             (=zero?-poly (rest-terms terms)))))
+        (and (=zero? (coeff (first-term term-list)))
+             (=zero?-poly (rest-term-list term-list)))))
 
   (put '=zero? '(polynomial) =zero?-poly)
 #+END_SRC
@@ -1671,8 +1699,46 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
   (define (empty-termlist? term-list) (null? term-list))
 #+END_SRC
 
-* TODO Exercise2.90
-定义一个多项式系统, 使其同时允许两种表示形式, 实现如下:
-#+Name: polynomial.scm
+* Exercise2.90
+为了实现同时允许稠密多项式和稀疏多项式的系统，需要为不同表示的 ~term-list~ 添加标签，并分别实现 ~make-poly-from-parse~ 和 ~make-poly-from-dense~ 构造函数。在定义相关操作时，需要先判断当前多项式的构造类型，然后根据其对应的类型应用对应于稀疏表示和稠密表示的 ~term-list~ 操作.
+
+* Exercise2.91
+~div-terms~ 的完整定义以及基于 ~div-terms~ 实现的 ~div-poly~ 的过程定义如下:
+#+NAME: div-poly.scm
 #+BEGIN_SRC scheme
+  (define (div-terms L1 L2)
+    (if (empty-termlist? L1)
+        (list (the-empty-termlist) (the-empty-termlist))
+        (let ((t1 (first-term L1))
+              (t2 (first-term L2)))
+          (if (> (order t2) (order t1))
+              (list (the-empty-termlist) L1)
+              (let ((new-c (div (coeff t1) (coeff t2)))
+                    (new-o (- (order t1) (order t2))))
+                (let ((rest-of-result
+                       (sub-poly L1 (mul-poly L2 (make-term new-c new-o)))))
+                  (list (add-term (make-term new-c new-0)
+                                  (car rest-of-result))
+                        (cadr rest-of-result))))))))
+
+  ;; installation as package
+  (define (div-poly p1 p2)
+    (if (same-variable? (variable p1) (variable p2))
+        (make-poly (variable p1)
+                   (div-terms (term-list p1)
+                              (term-list p2)))
+        (error "Poly not in same var -- DIV-POLY"
+               (list p1 p2))))
+
+  (put 'div '(polynomial polynomial)
+       (λ (p1 p2) (tag (div-poly p1 p2))))
 #+END_SRC
+
+* TODO Exercise2.92
+TODO: 通过加入强制性的变量序扩充多项式程序包,使多项式的加法和乘法能对具有不同变量的多项式进行.
+
+* Exercise2.93
+* Exercise2.94
+* Exercise2.95
+* Exercise2.96
+* Exercise2.97
