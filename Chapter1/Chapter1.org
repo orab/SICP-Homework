@@ -49,7 +49,7 @@
 1. 如果采用应用序求值, 由于解释器要先求出两个参数的值, 而第二个参数会导致无限
    的递归循环, 所以采用应用序会使程序陷入无限的递归中;
 2. 如果采用正则序求值, 解释器只有在需要时才会求值, 这样当程序测试第一个参数时
-   第二个参数还未被求值, 因此程序返回结果0.
+   第二个参数还未被求值, 因此程序返回结果 0.
 * Exercise1.6
 作为一个普通的函数过程, 解释器会预先对所有的参数进行求值, 这样的话, 无论
 =predicate= 语句为真与否, =then-clause= 和 =else-clause= 都会执行, 如果两部分
@@ -58,8 +58,8 @@
 在用 =new-if= 实现的平方根程序中, 由于两部分的分支语句都会被执行, 而在 =else=
 部分的语句是递归调用的, 所以程序会陷入无限递归中.
 * Exercise1.7
-如果数很小, 使用原程序时计算过程会提前终止, 比如该数为0.00000001时, 由于数字
-本身远小于阈值, 这样只要中间值的平方进入0.00000001到0.00010001的范围内就会终
+如果数很小, 使用原程序时计算过程会提前终止, 比如该数为 0.00000001 时, 由于数字
+本身远小于阈值, 这样只要中间值的平方进入 0.00000001 到 0.00010001 的范围内就会终
 止计算返回结果, 显然这样误差很大; 如果数很大, 由于使用的浮点数只能表示一定精
 度范围以内的值, 程序可能永远无法得到满足给定阈值的结果, 因此程序会陷入无限的
 循环之中.
@@ -216,8 +216,8 @@
 绘制展开树.
 空间增长为 \Theta(n), 步数增长为 \Theta(2^n).
 * Exercise1.15
-1. 12.15 = 0.05 * 3^5, 即在求值 =(sine 12.15)= 时将从0.05开始计算, 每次得到三
-   倍于该角度的正弦值, 所以p将被使用5次.
+1. 12.15 = 0.05 * 3^5, 即在求值 =(sine 12.15)= 时将从 0.05 开始计算, 每次得到三
+   倍于该角度的正弦值, 所以 p 将被使用 5 次.
 2. 空间和步数的增长都为 \Theta(log n). 对于一棵递归树来说, 所用空间相当于该树
    的最大深度, 所用步数相当于所有结点的个数. 当为线性递归时, 最大深度等于所有
    结点个数, 即空间增长与步数增长相同.
@@ -268,7 +268,7 @@
 #+END_SRC
 * Exercise1.19
 经过简单计算化简可得: p' = p^2+q^2, q' = 2pq + q^2, 将该变换带入对应的过程,
-得到只需对数步的求Fibonacci数的程序为:
+得到只需对数步的求 Fibonacci 数的程序为:
 #+Name: Exercise1.19
 #+BEGIN_SRC scheme
   (define (fib n)
@@ -303,9 +303,9 @@
                   (remainder (remainder 206 40)
                              (remainder 40 (remainder 206 40)))))
 #+END_SRC
-实际执行了11次remainder运算.
+实际执行了 11 次 remainder 运算.
 
-其中定义remainder运算的过程为:
+其中定义 remainder 运算的过程为:
 #+Name: Exercise1.20.2
 #+BEGIN_SRC scheme
   (define (remainder a b)
@@ -314,9 +314,9 @@
           (floor (/ a b)))))
 #+END_SRC
 
-如果采用应用序的话实际需要执行remainder运算4次.
+如果采用应用序的话实际需要执行 remainder 运算 4 次.
 * Exercise1.21
-199的最小因子是199, 1999的最小因子是1999, 19999的最小因子是7.
+199 的最小因子是 199, 1999 的最小因子是 1999, 19999 的最小因子是 7.
 * Exercise1.22
 检查给定范围内连续的各个奇数的素性的程序如下:
 #+Name: Exercise1.23
@@ -443,9 +443,9 @@
   1000037 *** 101
 
 #+END_SRC
-可以看出每一次的输出与上一次输出的时间比约为根号10. 和预期的时间消耗相一致.
+可以看出每一次的输出与上一次输出的时间比约为根号 10. 和预期的时间消耗相一致.
 * Exercise1.23
-修改后的smallest-divisor程序为:
+修改后的 smallest-divisor 程序为:
 #+Name: Exercise1.23
 #+BEGIN_SRC scheme
   (define (prime? n)
@@ -467,7 +467,7 @@
 
     (= (smallest-divisor n) n))
 #+END_SRC
-使用新版本的smallest-divisor的输出为:
+使用新版本的 smallest-divisor 的输出为:
 #+Name: Output
 #+BEGIN_SRC
   scheme@(guile-user)> (search-for-primes 1000 1020)
@@ -550,9 +550,9 @@
   1000037 *** 59
 
 #+END_SRC
-运行速度并没有正好快一倍, 但是可以看到, 随着规模的变大, 比值向2在靠近. 原因可
+运行速度并没有正好快一倍, 但是可以看到, 随着规模的变大, 比值向 2 在靠近. 原因可
 能是因为程序中除了主体之外还存在其他的时间消耗, 随着输入规模的变大, 主体所占
-比重越来越大, 比值也就越来越接近于2.
+比重越来越大, 比值也就越来越接近于 2.
 * TOVERIFY Exercise1.24
 使用费马方法修改上述的过程, 程序如下:
 #+Name: Exercise1.25
@@ -604,10 +604,10 @@
 题目中的简单写法可以在\Theta(\log(n))的时间里计算出幂, 但是这时的结果会很大,
 在进行求余的操作时会耗费大量的时间.
 * Exercise1.26
-如果使用显示的乘法过程, 那么在每次递归时都会调用两次的expmod函数, 这样的话递
+如果使用显示的乘法过程, 那么在每次递归时都会调用两次的 expmod 函数, 这样的话递
 归树从一棵单链树变为二叉树, 所以时间复杂度由\Theta(log(n))变为\Theta(n).
 * Exercise1.27
-使用小于n的每一个数来做费马验证的过程为:
+使用小于 n 的每一个数来做费马验证的过程为:
 #+Name: Exercise1.27
 #+BEGIN_SRC scheme
   (define (fermat-test n)
@@ -631,7 +631,7 @@
     (fermat-test-iter n 1))
 
 #+END_SRC
-使用上述过程对Carmichael数进行检验, 其结果如下:
+使用上述过程对 Carmichael 数进行检验, 其结果如下:
 #+Name: Exercise1.27.2
 #+BEGIN_SRC
   scheme@(guile-user)> (fermat-test 561)
@@ -649,7 +649,7 @@
 #+END_SRC
 * VERIFIED Exercise1.28
 CLOSED: [2015-03-25 Wed 15:38]
-利用Miller-Rabin检查来判断素数的过程如下:
+利用 Miller-Rabin 检查来判断素数的过程如下:
 #+Name: Exercise1.28
 #+BEGIN_SRC scheme
   (define (miller-rabin-test n)
@@ -698,9 +698,9 @@ CLOSED: [2015-03-25 Wed 15:38]
           3)
        (sum term a next b 0)))
 #+END_SRC
-当n为100时结果为 =0.24671666666666678=, 当n为1000时结果为 =0.24966716666666608=.
+当 n 为 100 时结果为 =0.24671666666666678=, 当 n 为 1000 时结果为 =0.24966716666666608=.
 * Exercise1.30
-迭代的sum过程版本为:
+迭代的 sum 过程版本为:
 #+Name: Exercise1.30
 #+BEGIN_SRC scheme
   (define (sum term a next b)
@@ -728,7 +728,7 @@ CLOSED: [2015-03-25 Wed 15:38]
        (define (inc x) (+ 1 x))
        (product identity 1 inc n))
    #+END_SRC
-   用 =product= 计算\pi的近似值的过程为:
+   用 =product= 计算\pi 的近似值的过程为:
    #+Name: pi-product.scm
    #+BEGIN_SRC scheme
      (define (pi-product n)
@@ -800,14 +800,14 @@ CLOSED: [2015-03-25 Wed 15:38]
                      (filter-accumulate filter combiner null-value term (next a)
                                        next b)))))
 #+END_SRC
-1. 求a到b之间所有素数之和的过程为:
+1. 求 a 到 b 之间所有素数之和的过程为:
    #+Name: prime-sum.scm
    #+BEGIN_SRC scheme
      (define (prime-sum a b)
        (define (inc x) (+ 1 x))
        (filter-accumulate prime? + 0 identity a inc b))
    #+END_SRC
-2. 求小于n的所有与n互素的正整数的乘积的过程为:
+2. 求小于 n 的所有与 n 互素的正整数的乘积的过程为:
    #+Name: relatively-prime-sum.scm
    #+BEGIN_SRC scheme
      (define (relatively-prime-product n)
@@ -940,9 +940,9 @@ CLOSED: [2015-03-25 Wed 15:38]
                 (+ (d x) (cont-frac-reverse n d (+ 1 x))))))
        (cont-frac-reverse n d 1))
     #+END_SRC
-   当 n 和 d 取值都为1时, 前几个取值依次为: =1=, =1/2=, =2/3=, =3/5=, =5/8=,
-   ... 可以观察到分母是一个 Fibonacci 数列, 若要保证得到的近似值具有十进制的4位
-   精度,则分母应该大于10000, 即 k 应满足 =Fib(k)>=10000=, 所以 k 的取值为大于21
+   当 n 和 d 取值都为 1 时, 前几个取值依次为: =1=, =1/2=, =2/3=, =3/5=, =5/8=,
+   ... 可以观察到分母是一个 Fibonacci 数列, 若要保证得到的近似值具有十进制的 4 位
+   精度,则分母应该大于 10000, 即 k 应满足 =Fib(k)>=10000=, 所以 k 的取值为大于 21
    (fib(21) = 10946).
 2. 上述的函数过程是递归形式的, 相应的迭代形式的版本为:
    #+Name: cont-frac-iter.scm
@@ -996,7 +996,7 @@ CLOSED: [2015-03-25 Wed 15:38]
 #+END_SRC
 * Exercise1.41
 最终输出的结果是 =21=, 每调用一次 =double= 相当于调用两次参数表示的函数, 即
-=(double double)= 表示调用4次, =(double (double double))= 表示调用2次4次的过程,
+=(double double)= 表示调用 4 次, =(double (double double))= 表示调用 2 次 4 次的过程,
 即 =4 ^ 2 = 16= 次调用, 所以结果为 =5 + 16 = 21=. 使用程序进行验证的输出为:
 #+Name: output (double)
 #+BEGIN_SRC
