@@ -1,7 +1,7 @@
 #+TITLE: SICP Solutions: Chapter2
 #+AUTHOR: Orab
 
-#+STARTUP: indent content entitiespretty latexpreview
+#+STARTUP: entitiespretty latexpreview
 #+OPTIONS: ^:{} num:nil
 #+TODO: TODO(t) TOVERIFY(v) | VERIFIED(d)
 
@@ -68,7 +68,7 @@
 #+END_SRC
 
 * Exercise2.3
-*假设所有矩形的边与x轴, y轴分别平行.*
+*假设所有矩形的边与 x 轴, y 轴分别平行.*
 
 可以通过左上角和右下角的两个点来定义平面上的矩形:
 #+BEGIN_SRC scheme
@@ -129,7 +129,7 @@
 #+END_SRC
 
 * Exercise2.5
-由于2的幂和3的幂不存在大于1的公约数, 所以分别找出可以整除的2的最大次幂和可以整除的3的最大次幂的结果就可以确定a和b的值.
+由于 2 的幂和 3 的幂不存在大于 1 的公约数, 所以分别找出可以整除的 2 的最大次幂和可以整除的 3 的最大次幂的结果就可以确定 a 和 b 的值.
 
 过程定义如下:
 #+Name: cons-power.scm
@@ -153,7 +153,7 @@
 #+END_SRC
 
 * Exercise2.6
-通过代换Church计数的 ~zero~ 和 ~add-1~ 到 ~(add-1 zero)~ 中, 结果如下:
+通过代换 Church 计数的 ~zero~ 和 ~add-1~ 到 ~(add-1 zero)~ 中, 结果如下:
 #+Name: one.scm
 #+BEGIN_SRC scheme
   (add-1 zero)
@@ -175,7 +175,7 @@
 #+END_SRC
 即 ~two~ 的定义式为 ~(lambda (f) (lambda (x) (f (f x))))~.
 
-经过上面的代换可以看出 ~add-1~ 的过程实际上相当于在原来的过程中增加了一个 ~f~ 函数的迭代调用, 而加法的定义可以看做是 ~add-n~ 的过程, 即要在原来的过程中增加 n 个 ~f~ 函数的迭代调用, 等于用 Church 计数时数n中 ~f~ 函数迭代调用的次数.
+经过上面的代换可以看出 ~add-1~ 的过程实际上相当于在原来的过程中增加了一个 ~f~ 函数的迭代调用, 而加法的定义可以看做是 ~add-n~ 的过程, 即要在原来的过程中增加 n 个 ~f~ 函数的迭代调用, 等于用 Church 计数时数 n 中 ~f~ 函数迭代调用的次数.
 
 因此加法过程的一个直接定义为:
 #+Name: add.scm
@@ -229,7 +229,7 @@
 #+END_SRC
 
 * TOVERIFY Exercise2.11
-TOVERIFY: 在 ~(-, +)*(-, +)~ 的过程中用了4次乘法, 怎样才能在只用2次的情况下得出答案?
+TOVERIFY: 在 ~(-, +)*(-, +)~ 的过程中用了 4 次乘法, 怎样才能在只用 2 次的情况下得出答案?
 
 重写 ~mul-interval~ 的过程如下:
 #+BEGIN_SRC scheme
@@ -377,7 +377,7 @@ TODO: 要想使得等价的代数表达式得到的结果相同, 需要考虑相
   (define (first-denomination coin-values)
     (car coin-values))
 #+END_SRC
-表 ~coin-values~ 的排列顺序不会影响cc给出的答案, 因为
+表 ~coin-values~ 的排列顺序不会影响 cc 给出的答案, 因为
 ~except-first-denomination~ 和 ~first-denomination~ 的过程包含了所有可能的情况,
 即任何一种可能的情况要么出现在第一种情况中, 要么出现在第二种情况中, 而与顺序无关.
 
@@ -413,8 +413,8 @@ TODO: 要想使得等价的代数表达式得到的结果相同, 需要考虑相
 #+END_SRC
 
 * Exercise2.22
-1. 按第一种方式产生出的结果中, 因为items中先被取出(car)的元素会先被加入结果的表中, 这样原表中的元素在新表中会在与之对称的位置, 即元素的顺序正好相反.
-2. 按照第二种方式, 说得结果中每个cons的第二个元素都指向一个实际值, 与表定义所要求的正好相反.
+1. 按第一种方式产生出的结果中, 因为 items 中先被取出(car)的元素会先被加入结果的表中, 这样原表中的元素在新表中会在与之对称的位置, 即元素的顺序正好相反.
+2. 按照第二种方式, 说得结果中每个 cons 的第二个元素都指向一个实际值, 与表定义所要求的正好相反.
 
 * Exercise2.23
 过程 ~for-each~ 的一个实现如下:
@@ -432,7 +432,7 @@ TODO: 要想使得等价的代数表达式得到的结果相同, 需要考虑相
 [[./images/224.png]]
 
 * Exercise2.25
-从下面各表中取出7的 ~car~ 和 ~cdr~ 的组合为:
+从下面各表中取出 7 的 ~car~ 和 ~cdr~ 的组合为:
 #+Name: Solutions
 #+BEGIN_SRC scheme
   ;; (1 3 (5 7) 9)
@@ -622,7 +622,7 @@ TODO: 要想使得等价的代数表达式得到的结果相同, 需要考虑相
 #+END_SRC
 
 * Exercise2.34
-利用Horner规则求多项式值的完整过程定义如下:
+利用 Horner 规则求多项式值的完整过程定义如下:
 #+Name: horner-eval.scm
 #+BEGIN_SRC scheme
   (define (horner-eval x coefficient-sequence)
@@ -779,8 +779,10 @@ TODO: 要想使得等价的代数表达式得到的结果相同, 需要考虑相
 #+END_SRC
 
 * Exercise2.43
-假设执行一次 ~adjoin-position~ 的时间为单位时间, 当我们采用Exercise2.42中的过程
-时, 有 ~T(n) = T(n - 1) + a(n - 1) * k~, 其中 ~T(n)~ 表示 ~k = n~ 的运行时间,
+时间消耗为 ~7! * T~.
+
+假设执行一次 ~adjoin-position~ 的时间为单位时间, 当我们采用 Exercise2.42 中的过
+程时, 有 ~T(n) = T(n - 1) + a(n - 1) * k~, 其中 ~T(n)~ 表示 ~k = n~ 的运行时间,
 ~a(n)~ 表示 ~(queen-cols n)~ 的长度. 当交换嵌套映射的顺序后, 运行时间 ~T'(n) ~
 s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去解决八皇后问题
 时, 时间消耗大致为 ~8^8 * T~.
@@ -1239,7 +1241,7 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
 
 * Exercise2.64
 1. ~partial-tree~ 在每次递归时将所有结点分为两半, 这样保证了对于生成树的任意一
-   个结点, 其左子树与右子树结点数差不超过1, 因此该生成树是平衡二叉树. 将
+   个结点, 其左子树与右子树结点数差不超过 1, 因此该生成树是平衡二叉树. 将
    ~paritial-tree~ 用于表 ~(1 3 5 7 9)~ 产生的树为:
    #+Name: Output
    #+BEGIN_SRC scheme
@@ -1251,7 +1253,7 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
            (11 ()
                ())))
    #+END_SRC
-2. 由程序的递归关系可得 ~T(n) = 2 * T(n / 2) + \Theta(1)~, 所以转换n个元素的表
+2. 由程序的递归关系可得 ~T(n) = 2 * T(n / 2) + \Theta(1)~, 所以转换 n 个元素的表
    所需的步数以 \Theta(n) 为量级.
 
 * Exercise2.65
@@ -1316,7 +1318,7 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
 #+END_SRC
 
 * Exercise2.69
-根据符号-频度对偶表生成Huffman编码树的过程实现如下:
+根据符号-频度对偶表生成 Huffman 编码树的过程实现如下:
 #+Name: generate-huffman-tree.scm
 #+BEGIN_SRC scheme
   (define (generate-huffman-tree pairs)
@@ -1331,7 +1333,7 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
 #+END_SRC
 
 * Exercise2.70
-定义8个符号的字母频度表和文本消息:
+定义 8 个符号的字母频度表和文本消息:
 #+Name: Exercise
 #+BEGIN_SRC scheme
   (define pairs
@@ -1341,21 +1343,21 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
     '(get a job sha na na na na na na na na get a job sha na na na na na na
           na na wah yip yip yip yip yip yip yip yip yip sha boom))
 #+END_SRC
-利用huffman编码过程生成的编码为:
+利用 huffman 编码过程生成的编码为:
 #+Name: Output
 #+BEGIN_SRC
   scheme@(guile-user)> (encode message (generate-huffman-tree pairs))
   $1 = (1 1 1 1 1 1 1 0 0 1 1 1 1 0 1 1 1 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 0 0 1 1 1 1 0 1 1 1 0 0 0 0 0 0 0 0 0 1 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1 1 1 0 1 1 0 1 1)
 
 #+END_SRC
-这一编码一共使用了88个二进制位. 若采用定长编码, 每个符号需要3个二进制位, 完成这
+这一编码一共使用了 88 个二进制位. 若采用定长编码, 每个符号需要 3 个二进制位, 完成这
 个歌曲最少需要 ~36 * 4 = 144~ 个二进制位.
 
 * Exercise2.71
 对于这样的编码, 出现最频繁的符号要用 2 个二进制位表示, 最不频繁的符号要用 n 个二进制位表示.
 
 * Exercise2.72
-当符号的相对频率满足如2.71中所描述的规则时, 编码最频繁的符号所需的步数的增长速率为 \Theta(1), 最不频繁的符号所需步数的增长速率为 \Theta(n^{2}).
+当符号的相对频率满足如 2.71 中所描述的规则时, 编码最频繁的符号所需的步数的增长速率为 \Theta(1), 最不频繁的符号所需步数的增长速率为 \Theta(n^{2}).
 
 * Exercise2.73
 1. 数据导向的求导程序根据表达式的操作类型的不同选择不同的求导过程. 由于对于是否是数字还是符号的判断是一个通用的过程，不需要根据不同的实现来进行选择，所以不应该将 ~number?~ 和 ~same-variable?~ 也加入数据导向分派中.
@@ -1448,7 +1450,7 @@ s * T'(n - 1) + a(n - 1) * k~, 其中 ~s~ 代表棋盘的大小, 当用后者去
 其中 ~apply-generic~ 被调用了两次, 由于两次参数的类型不同, 实际会调用不同的过程.
 
 * Exercise2.78
-利用Scheme的内部类型系统来改进原过程:
+利用 Scheme 的内部类型系统来改进原过程:
 #+Name: scheme-number-ex.scm
 #+BEGIN_SRC scheme
   ;; modify function: type-tag
