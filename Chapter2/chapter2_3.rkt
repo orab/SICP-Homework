@@ -407,12 +407,96 @@
 ;; end 2.65
 
 ;; Exercise 2.66
-(define (lookup given-key set-of-records)
-  (cond ((null? set-of-records) false)
-        ((= given-key (key (entry set-of-records)))
-         (entry set-of-records))
-        ((< given-key (key (entry set-of-records)))
-         (lookup given-key (left-branch set-of-records)))
-        ((> given-key (key (entry set-of-records)))
-         (lookup given-key (right-branch set-of-records)))))
+;; (define (lookup given-key set-of-records)
+;;   (cond ((null? set-of-records) false)
+;;         ((= given-key (key (entry set-of-records)))
+;;          (entry set-of-records))
+;;         ((< given-key (key (entry set-of-records)))
+;;          (lookup given-key (left-branch set-of-records)))
+;;         ((> given-key (key (entry set-of-records)))
+;;          (lookup given-key (right-branch set-of-records)))))
 ;; end 2.66
+
+;; Huffman Encoding Trees
+(define (make-leaf symbol weight) (list 'leaf symbol weight))
+(define (leaf? object) (eq? (car object) 'leaf))
+(define (symbol-leaf x) (cadr x))
+(define (symbol-weight x) (caddr x))
+
+(define (make-code-tree left right)
+  (list left
+        right
+        (append (symbols left) (symbols right))
+        (+ (weight left) (weight right))))
+
+(define (code-tree-left-branch tree) (car tree))
+(define (code-tree-right-branch tree) (cadr tree))
+(define (symbols tree)
+  (if (leaf? tree)
+      (list (symbol-leaf tree))
+      (caddr tree)))
+(define (weight tree)
+  (if (leaf? tree)
+      (symbol-weight tree)
+      (cadddr tree)))
+
+(define (decode bits tree)
+  (define (decode-1 bits current-branch)
+    (if (null? bits)
+        '()
+        (let ((next-branch (choose-branch (car bits) current-branch)))
+          (if (leaf? next-branch)
+              (cons (symbol-leaf next-branch)
+                    (decode-1 (cdr bits) tree))
+              (decode-1 (cdr bits) next-branch)))))
+  (decode-1 bits tree))
+
+(define (choose-branch bit branch)
+  (cond ((= bit 0) (code-tree-left-branch branch))
+        ((= bit 1) (code-tree-right-branch branch))
+        (else (error "bad bit: CHOOSE-BRANCH" bit))))
+
+(define (code-tree-adjoin-set x set)
+  (cond ((null? set) (list x))
+        ((< (weight x) (weight (car set))) (cons x set))
+        (else (cons (car set) (code-tree-adjoin-set x (cdr set))))))
+
+(define (make-leaf-set pairs)
+  (if (null? pairs)
+      '()
+      (let ((pair (car pairs)))
+        (code-tree-adjoin-set (make-leaf (car pair)
+                                         (cadr pair))
+                              (make-leaf-set (cdr pairs))))))
+
+;; Exercise 2.68
+(define (encode message tree)
+  (if (null? message)
+      '()
+      (append (encode-symbol (car message) tree)
+              (encode (cdr message) tree))))
+
+(define (encode-symbol symbol tree)
+  (cond ((null? tree) (error "tree is empty: ENCODE-SYMBOL" tree))
+        ((leaf? tree) '())
+        ((element-of-set? symbol (symbols (code-tree-left-branch tree)))
+         (cons 0 (encode-symbol symbol (code-tree-left-branch tree))))
+        ((element-of-set? symbol (symbols (code-tree-right-branch tree)))
+         (cons 1 (encode-symbol symbol (code-tree-right-branch tree))))
+        (else (error "symbol is not defined: ENCODE-SYMBOL" symbol))))
+
+;; end 2.68
+
+;; Exercise 2.69
+(define (generate-huffman-tree pairs)
+  (successive-merge (make-leaf-set pairs)))
+
+(define (successive-merge set)
+ (cond ((null? set) '())
+        ((null? (cdr set)) (car set))
+        (else
+         (let ((left (car set)) (right (cadr set)))
+           (successive-merge
+            (code-tree-adjoin-set (make-code-tree left right)
+                                  (cddr set)))))))
+;; end 2.69
